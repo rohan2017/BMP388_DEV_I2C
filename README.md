@@ -274,20 +274,33 @@ The interrupts can also be disabled by calling the disable interrupt function:
 ```
 bmp388.disableInterrupt();		// Enable interrupts with default settings
 ```
+The interrupt settings can also be changed independently:
 
-Attaching the Arduino to the BMP388's interrupt pins is performed using the standard attachInterrupt() function:
+```
+bmp388.setIntOutputDrive(OPEN_DRAIN);		// Set the interrupt pin's output drive to open drain
+```
+
+```
+bmp388.setIntActiveLevel(ACTIVE_LOW);		// Set the interrupt signal's active level to LOW
+```
+
+```
+bmp388.setIntLatchConfig(LATCHED);		// Set the interrupt signal to latch until cleared
+```
+
+Attaching the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function:
 
 ```
 attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
 ```
 
-If the SPI interface being shared with other devices then it is also necessary to call the SPI usingInterrupt function as well:
+If the SPI interface is being used and happens to be shared with other devices, then it is also necessary to call the SPI usingInterrupt function as well:
 
 ```
 bmp388.usingInterrupt(digitalPinToInterrupt(2));     // Invoke the SPI usingInterrupt() function
 ```
 
-The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately therefore not possible to call the results acqusition functions from within the INT pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
+The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately therefore not possible to call the results acqusition functions (such as getTemperature(), getPressure() and getMeasurements()) from within the INT pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
 
 Here is an example sketch using I2C in NORMAL_MODE, default configuration with interrupts:
 
@@ -334,7 +347,7 @@ void interruptHandler()                           // Interrupt handler function
 }
 ```
 
-The SPI interface on the other hand, does allow for the results acquistion functions to be called from within the ISR.
+The SPI interface on the other hand, does allow for the results acquisition functions to be called from within the ISR.
 
 Here is an example sketch using SPI in NORMAL_MODE, default configuration with interrupts:
 
@@ -377,10 +390,8 @@ void loop()
 
 void interruptHandler()                             // Interrupt handler function
 {
-  if(bmp388.getMeasurements(temperature, pressure, altitude))    // Read the measurement data
-  {
-    dataReady = true;                                 // Set the data ready flag
-  }
+  bmp388.getMeasurements(temperature, pressure, altitude))    // Read the measurement data
+  dataReady = true;                                 // Set the data ready flag
 }
 ```
 ---
