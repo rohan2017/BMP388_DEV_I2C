@@ -287,26 +287,113 @@ If the SPI interface being shared with other devices then it is also necessary t
 bmp388.usingInterrupt(digitalPinToInterrupt(2));     // Invoke the SPI usingInterrupt() function
 ```
 
-The I2C interface uses the Arduino library. This library calls on interrupts itself during operation, unfortunately it is therefore to possible to call the results acqusition functions from within the interrupt pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set with the ISR that allows the barometer data to be read in the main loop() function.
+The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately therefore not possible to call the results acqusition functions from within the INT pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
 
 Here is an example sketch using I2C in NORMAL_MODE, default configuration with interrupts:
 
 ```
+///////////////////////////////////////////////////////////////////////////////
+// BMP388_DEV - I2C Communications, Default Configuration, Normal Conversion
+///////////////////////////////////////////////////////////////////////////////
 
+#include <BMP388_DEV.h>                           // Include the BMP388_DEV.h library
+
+volatile boolean dataReady = false;
+
+BMP388_DEV bmp388;                                // Instantiate (create) a BMP388_DEV object and set-up for I2C operation (address 0x77)
+
+void setup() 
+{
+  Serial.begin(115200);                           // Initialise the serial port
+  bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE 
+  bmp388.enableInterrupt();                       // Enable the BMP388's interrupt (INT) pin
+  attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
+  bmp388.startNormalConversion();                 // Start BMP388 continuous conversion in NORMAL_MODE  
+}
+
+void loop() 
+{
+  if (dataReady)
+  {
+    float temperature, pressure, altitude;
+    bmp388.getMeasurements(temperature, pressure, altitude);      // Read the measurements
+    Serial.print(temperature);                    // Display the results    
+    Serial.print(F("*C   "));
+    Serial.print(pressure);    
+    Serial.print(F("hPa   "));
+    Serial.print(altitude);
+    Serial.println(F("m")); 
+    dataReady = false;                            // Clear the dataReady flag
+  }   
+}
+
+void interruptHandler()                           // Interrupt handler function
+{
+  dataReady = true;                               // Set the dataReady flag
+}
 ```
 
-The SPI interface on the other hand does allow for the results acquistion functions to be called from within the ISR.
+The SPI interface on the other hand, does allow for the results acquistion functions to be called from within the ISR.
 
 Here is an example sketch using SPI in NORMAL_MODE, default configuration with interrupts:
 
 ```
+///////////////////////////////////////////////////////////////////////////////
+// BMP388_DEV - SPI Communications, Default Configuration, Normal Conversion
+///////////////////////////////////////////////////////////////////////////////
 
+#include <BMP388_DEV.h>                             // Include the BMP388_DEV.h library
+
+volatile boolean dataReady = false;
+volatile float temperature, pressure, altitude;
+
+BMP388_DEV bmp388(10);                              // Instantiate (create) a BMP388_DEV object and set-up for SPI operation on digital pin D10
+
+void setup() 
+{
+  Serial.begin(115200);                             // Initialise the serial port
+  bmp388.begin();                                   // Default initialisation, place the BMP388 into SLEEP_MODE 
+  bmp388.enableInterrupt();                         // Enable the BMP388's interrupt (INT) pin
+  bmp388.usingInterrupt(digitalPinToInterrupt(2));  // Invoke the SPI usingInterrupt() function
+  attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);       // Set the standby time to 1.2 seconds
+  bmp388.startNormalConversion();                   // Start BMP388 continuous conversion in NORMAL_MODE 
+}
+
+void loop() 
+{
+  if (dataReady)                                    // Check if the measurement is complete
+  {   
+    dataReady = false;                              // Clear the data ready flag
+    Serial.print(temperature);                      // Display the results    
+    Serial.print(F("*C   "));
+    Serial.print(pressure);    
+    Serial.print(F("hPa   "));
+    Serial.print(altitude);
+    Serial.println(F("m"));  
+  }
+}
+
+void interruptHandler()                             // Interrupt handler function
+{
+  if(bmp388.getMeasurements(temperature, pressure, altitude))    // Read the measurement data
+  {
+    dataReady = true;                                 // Set the data ready flag
+  }
+}
 ```
-
 ---
 ## __FIFO (First In First Out) Operation__ 
 
 The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements.
+
+To enable the FIFO simply cal
+
+---
+## __FIFO Operation with Interrupts__ 
+
+The BMP388 barometer also allows FIFO operation to be integrated with interrupts from the INT pin.
 
 ---
 ## __Example Code__
