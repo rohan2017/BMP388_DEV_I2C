@@ -253,6 +253,62 @@ BMP388_DEV bmp388(10);	// Instantiate (create) a BMP388_DEV object and set-up fo
 For more details see code examples provided in the _.../examples/..._ directory.
 
 ---
+### __Interrupts__
+
+The BMP388 barometer has an INT output pin that allows measurements to be interrupt driven instead of polling, both in NORMAL and FORCED modes of operation.
+
+Interrupts are enabled by calling the enable interrupt function with or without parameters. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. UNLATCHED automatically clears the interrupt signal after 2.5ms, while LATCHED remains active until the data is read.
+
+The default settigs are PUSH_PULL, ACTIVE_HIGH and UNLATCHED:
+
+```
+bmp388.enableInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable interrupts with default settings
+```
+Alternatively these settings are used if the enable interrupt function is called without any parameters:
+
+```
+bmp388.enableInterrupt();		// Enable interrupts with default settings
+```
+The interrupts can also be disabled by calling the disable interrupt function:
+
+```
+bmp388.disableInterrupt();		// Enable interrupts with default settings
+```
+
+Attaching the Arduino to the BMP388's interrupt pins is performed using the standard attachInterrupt() function:
+
+```
+attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
+```
+
+If the SPI interface being shared with other devices then it is also necessary to call the SPI usingInterrupt function as well:
+
+```
+bmp388.usingInterrupt(digitalPinToInterrupt(2));     // Invoke the SPI usingInterrupt() function
+```
+
+The I2C interface uses the Arduino library. This library calls on interrupts itself during operation, unfortunately it is therefore to possible to call the results acqusition functions from within the interrupt pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set with the ISR that allows the barometer data to be read in the main loop() function.
+
+Here is an example sketch using I2C in NORMAL_MODE, default configuration with interrupts:
+
+```
+
+```
+
+The SPI interface on the other hand does allow for the results acquistion functions to be called from within the ISR.
+
+Here is an example sketch using SPI in NORMAL_MODE, default configuration with interrupts:
+
+```
+
+```
+
+---
+## __FIFO (First In First Out) Operation__ 
+
+The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements.
+
+---
 ## __Example Code__
 
 - I2C Normal Mode: 1.3 second automatic sampling rate with default settings
