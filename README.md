@@ -13,7 +13,7 @@ This BMP388_DEV library offers the following features:
 - Non-blocking operation 
 - In NORMAL mode barometer returns results at the specified standby time interval
 - Highly configurable, allows for changes to pressure and temperature oversampling, IIR filter and standby time
-- Polling or interrupt (using the BMP388's external INT pin) driven measurments
+- Polling or interrupt driven measurements (using the BMP388's external INT pin)
 - Storage and burst reading of measurements using the BMP388's internal 512KB FIFO memory
 
 ## __Version__
@@ -35,13 +35,13 @@ After download simply un-zip the file and place the BMP388 directory in your _..
 Simply include the BMP388_DEV.h file at the beginning of your sketch:
 
 ```
-#include <BMP280_DEV.h>
+#include <BMP388_DEV.h>
 ```
 
 For I2C communication the BMP388_DEV object is created (instantiated) without parameters:
 
 ```
-BMP280_DEV bmp280;	// Set up I2C communications
+BMP388_DEV bmp388;	// Set up I2C communications
 ```
 
 By default the library uses the BMP388's I2C address 0x77. (To use the alternate I2C address: 0x76, see the begin() function below.
@@ -49,14 +49,14 @@ By default the library uses the BMP388's I2C address 0x77. (To use the alternate
 For SPI communication the chip select (CS) Arduino digital output pin is specified as an argument, for example digital pin 10:
 
 ```
-BMP280_dev bmp280(10);	// Set up SPI communications on digital pin D10
+BMP388_dev bmp388(10);	// Set up SPI communications on digital pin D10
 ```
 
 The library also supports the ESP32 HSPI operation on pins: SCK 14, MOSI 13, MISO 27 and user defined SS (CS):
 
 ```
-SPIClass SPI1(HSPI);							// Create the SPI1 HSPI object
-BMP280_DEV bmp(21, HSPI, SPI1);		// Set up HSPI port communications on the ESP32
+SPIClass SPI1(HSPI);							    // Create the SPI1 HSPI object
+BMP388_DEV bmp388(21, HSPI, SPI1);		// Set up HSPI port communications on the ESP32
 ```
 
 By default the I2C runs in fast mode at 400kHz and SPI at 1MHz.
