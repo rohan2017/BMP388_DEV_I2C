@@ -386,14 +386,19 @@ void interruptHandler()                             // Interrupt handler functio
 ---
 ## __FIFO (First In First Out) Operation__ 
 
-The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements.
+The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements.  
 
-To enable the FIFO simply cal
+To enable the FIFO simply call the enableFIFO() function. By default the BMP388_DEV library always enables temperature, however this function allows parameters to be changed. The parameters include enabling pressure (PRESS_ENABLE), sensor time (TIME_ENABLE), sub
+
+The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample
+
 
 ---
 ## __FIFO Operation with Interrupts__ 
 
-The BMP388 barometer also allows FIFO operation to be integrated with interrupts from the INT pin.
+The BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. In NORMAL_MODE this is extremely useful for ultra low power applications, since it allows the barometer to indendently collect data over a long duration, while the microcontroller is asleep. The barometer's interrupt signal is then used to wake up the microcontroller, so that it can acquire and process the data.
+
+To enable FIFO interrupts simply set 
 
 ---
 ## __Example Code__
