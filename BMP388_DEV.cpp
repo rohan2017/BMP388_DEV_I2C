@@ -231,7 +231,7 @@ void BMP388_DEV::enableFIFO(PressEnable pressEnable,								// Enable the FIFO, 
 	fifo_config_1.reg = 1 << 4 | pressEnable << 3 | timeEnable << 2 | stopOnFull << 1;	
 	fifo_config_1.bit.fifo_mode = 1;	
 	writeByte(BMP388_FIFO_CONFIG_1, fifo_config_1.reg);
-	fifo_config_2.reg = (uint8_t)dataSelect << 3 | (uint8_t)subsampling;
+	fifo_config_2.reg = dataSelect << 3 | subsampling;
 	writeByte(BMP388_FIFO_CONFIG_2, fifo_config_2.reg);
 }
 
