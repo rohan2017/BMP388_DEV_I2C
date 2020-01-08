@@ -1,3 +1,5 @@
+# CURRENTLY UNDER DEVELOPMENT
+
 # BMP388_DEV
 An Arduino compatible, non-blocking, I2C/SPI library for the Bosch BMP388 barometer.
 
@@ -14,7 +16,7 @@ This BMP388_DEV library offers the following features:
 - In NORMAL mode barometer returns results at the specified standby time interval
 - Highly configurable, allows for changes to pressure and temperature oversampling, IIR filter and standby time
 - Polling or interrupt driven measurements (using the BMP388's external INT pin)
-- Storage and burst reading of measurements using the BMP388's internal 512KB FIFO memory
+- Storage and burst reading of up to 70 temperature and pressure measurements using the BMP388's internal 512KB FIFO memory
 
 ## __Version__
 
@@ -59,7 +61,11 @@ SPIClass SPI1(HSPI);							    // Create the SPI1 HSPI object
 BMP388_DEV bmp388(21, HSPI, SPI1);		// Set up HSPI port communications on the ESP32
 ```
 
-By default the I2C runs in fast mode at 400kHz and SPI at 1MHz.
+By default the I2C runs in fast mode at 400kHz and SPI at 1MHz. However it is possible to change the clock speed using the set clock function:
+
+```
+bmp388.setClock(4000000);			// Set the SPI clock to 4MHz
+```
 
 ---
 ### __Device Initialisation__
@@ -67,13 +73,13 @@ By default the I2C runs in fast mode at 400kHz and SPI at 1MHz.
 To initialise the BMP388 it is necessary to call the begin() function with or without parameters. The parameters specify the starting mode, pressure/temperature oversampling, IIR filter and standby time options respectively:
 
 ```
-bmp280.begin(SLEEP_MODE, OVERSAMPLING_X16, OVERSAMPLING_X2, IIR_FILTER_4, TIME_STANDBY_05MS);
+bmp388.begin(SLEEP_MODE, OVERSAMPLING_X16, OVERSAMPLING_X2, IIR_FILTER_4, TIME_STANDBY_5MS);
 ```
 
-Alternatively simply call the begin function without any paremeters, this sets up the default configuration: SLEEP_MODE, pressure oversampling X16, temperature oversampling X2, IIR filter OFF and a standby time of 0.5ms:
+Alternatively simply call the begin function without any paremeters, this sets up the default configuration: SLEEP_MODE, pressure oversampling X16, temperature oversampling X2, IIR filter OFF and a standby time of 5ms:
 
 ```
-bmp388.begin();	// Initialise the BMP380 with default configuration
+bmp388.begin();	// Initialise the BMP388 with default configuration
 ```
 
 Another alternative is to pass the BMP388's mode as an argument:
@@ -102,15 +108,15 @@ Note that the begin functions return the value 1 upon successful initialisation,
 After initialisation it is possible to change the BMP388 configuration with the following functions:
 
 ```
-bmp388.setPresOversamping(OVERSAMPING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16
+bmp388.setPresOversamping(OVERSAMPING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16, _32
 ```
 
 ```
-bmp388.setTempOversamping(OVERSAMPING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16
+bmp388.setTempOversamping(OVERSAMPING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16, _X32
 ```
 
 ```
-bmp388.setIIRFilter(IIR_FILTER_16);	// Options are IIR_FILTER_OFF, _2, _4, _8, _16
+bmp388.setIIRFilter(IIR_FILTER_16);	// Options are IIR_FILTER_OFF, _2, _4, _8, _16, _32
 ```
 
 ```
@@ -235,13 +241,13 @@ void loop()
 The sketches for SPI operation are identical except that the line:
 
 ```
-BMP388_DEV bmp280;	// Instantiate (create) a BMP388_DEV object and set-up for I2C operation (address 0x77)
+BMP388_DEV bmp388;	// Instantiate (create) a BMP388_DEV object and set-up for I2C operation (address 0x77)
 ```
 
 ...should be replaced with the line:
 
 ```
-BMP388_DEV bmp280(10);	// Instantiate (create) a BMP388_DEV object and set-up for SPI operation with chip select on D10
+BMP388_DEV bmp388(10);	// Instantiate (create) a BMP388_DEV object and set-up for SPI operation with chip select on D10
 ```
 
 For more details see code examples provided in the _.../examples/..._ directory.
@@ -249,33 +255,33 @@ For more details see code examples provided in the _.../examples/..._ directory.
 ---
 ## __Example Code__
 
-I2C Normal Mode: sampling at 1.3 seconds standby time intervals with default settings
+- I2C Normal Mode: 1.3 second automatic sampling rate with default settings
 
-I2C Normal Mode (Alterntive I2C Address): sampling at 1.3 second standby time intervals with default settings
+- I2C Normal Mode: (Alterntive I2C Address): 1.3 second automatic sampling rate with default settings
 
-I2C Forced Mode: with default settings
+- I2C Forced Mode: 1 second manual sampling rate with default settings
 
-SPI Normal Mode: sampling at 1.3 second standby time intervals with default settings
+- SPI Normal Mode: 1.3 second automatic sampling rate with default settings
 
-SPI Forced Mode: with default settings
+- SPI Forced Mode: 1 second manual sampling rate with default settings
 
-ESP32 HSPI Normal Mode: sampling at 1.3 second standby time intervals with default settings
+- ESP32 HSPI Normal Mode: 1.3 second automatic sampling rate with default settings
 
-SPI Normal Mode Multiple: sampling multiple BMP388 devices at 2 second standby time intervals with default settings
+- SPI Normal Mode Multiple: 1.3 second automatic sampling of multiple BMP388 with default settings
 
-I2C Normal Mode and Interrupts: sampling at 1.3 seconds standby time intervals with default settings
+- I2C Normal Mode and Interrupts: 1.3 second automatic sampling rate with default settings
 
-I2C Forced Mode and Interrupts: with default settings
+- I2C Forced Mode and Interrupts: 1 second manual sampling with default settings
 
-SPI Normal Mode and Interrupts: sampling at 1.3 seconds standby time intervals with default settings
+- SPI Normal Mode and Interrupts: 1.3 second automatic sampling rate with default settings
 
-SPI Forced Mode and Interrupts: sampling at 1.3 seconds standby time intervals with default settings
+- SPI Forced Mode and Interrupts: 1 second manual sampling rate with default settings
 
-I2C Normal Mode and FIFO : store 10 measurements, sampling at 1.3 seconds standby time intervals with default settings
+- I2C Normal Mode and FIFO : store 10 measurements at 1.3 second automatic sampling rate with default settings
 
-I2C Forced Mode and FIFO : store 10 measurements with default settings
+- I2C Forced Mode and FIFO : store 10 measurements at 1 second manual sampling rate with default settings
 
-SPI Normal Mode and FIFO : store 10 measurements, sampling at 1.3 seconds standby time intervals with default settings
+- SPI Normal Mode and FIFO : store 10 measurements, sampling at 1.3 seconds standby time intervals with default settings
 
-SPI Forced Mode and FIFO : store 10 measurements with default settings
+- SPI Forced Mode and FIFO : store 10 measurements with default settings
 
