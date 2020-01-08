@@ -1,7 +1,7 @@
 # BMP388_DEV
 An Arduino compatible, non-blocking, I2C/SPI library for the Bosch BMP388 barometer.
 
-![alt text](https://cdn-learn.adafruit.com/assets/assets/000/072/605/small240/sensors_BMP388_Top_Pinouts.jpg?1552408840 "Adafruit BMP388 Breakout Board")
+![alt text](https://cdn-learn.adafruit.com/assets/assets/000/072/428/small360/sensors_BMP388_Top_Angle.jpg?1551997243 "Adafruit BMP388 Breakout Board")
 
 © Copyright, image courtesy of [Adafruit Industries](https://www.adafruit.com/product/3966) lisensed under the terms of the [Create Commons Attribution-ShareAlike 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/legalcode). 
 
