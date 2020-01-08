@@ -14,7 +14,7 @@ This BMP388_DEV library offers the following features:
 - In NORMAL mode barometer returns results at the specified standby time interval
 - Highly configurable, allows for changes to pressure and temperature oversampling, IIR filter and standby time
 - Polling or interrupt (using the BMP388's external INT pin) driven measurments
-- Storage and burst reading of measurments using the BMP388's internal 512KB FIFO memory
+- Storage and burst reading of measurements using the BMP388's internal 512KB FIFO memory
 
 ## __Version__
 
