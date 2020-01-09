@@ -4,9 +4,6 @@
 	Copyright (C) Martin Lindupp 2020
 	
 	V1.0.0 -- Initial release 
-	V1.0.1 -- Added ESP32 HSPI support	
-	V1.0.2 -- Modified to allow external creation of HSPI object on ESP32
-	V1.1.0 -- Unified class for use with both BMP280 and BMP388 barometers
 	
 	The MIT License (MIT)
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,10 +54,8 @@ class Device{
 		void writeByte(uint8_t subAddress, uint8_t data);						// I2C and SPI write byte wrapper function
 		uint8_t readByte(uint8_t subAddress);												// I2C and SPI read byte wrapper function
 		void readBytes(uint8_t subAddress, uint8_t* dest, uint16_t count);		// I2C and SPI read bytes wrapper function
-#ifdef BMP388_DEV_h
-		void useInterrupt(uint8_t pinNumber);												// Invoke SPI.usingInterrupt() function
-		void notUsingInterrupt(uint8_t pinNumber);									// Invoke SPI.notUsingInterrupt() function
-#endif		
+		void usingInterrupt(uint8_t pinNumber);											// Wrapper for the SPI.usingInterrupt() function
+		void notUsingInterrupt(uint8_t pinNumber);									// Wrapper for the SPI.notUsingInterrupt() function	
 	private:
 		Comms comms;																								// Communications bus: I2C or SPI
 		uint8_t address;																						// The device I2C address
