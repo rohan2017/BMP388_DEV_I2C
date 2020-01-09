@@ -280,7 +280,6 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		void setOversamplingRegister(Oversampling presOversampling, // Set the BMP388 oversampling register
 																 Oversampling tempOversamping);		
 		uint8_t dataReady();																				// Checks is a measurement is ready
-		uint8_t getFIFOStatus();																		// Check if the FIFO data is ready or the that the FIFO is full
 		
 		struct {																										// The BMP388 compensation trim parameters (coefficients)
 			uint16_t param_T1;
@@ -428,5 +427,4 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		float bmp388_compensate_press(float uncomp_press, float t_lin); 		// Bosch pressure compensation function																				 
 		volatile bool alt_enable;																		// Altitude enable flag
 };
-
 #endif
