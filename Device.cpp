@@ -4,9 +4,6 @@
 	Copyright (C) Martin Lindupp 2020
 	
 	V1.0.0 -- Initial release
-	V1.0.1 -- Added ESP32 HSPI support	
-	V1.0.2 -- Modified to allow external creation of HSPI object on ESP32
-	V1.1.0 -- Unified class for use with both BMP280 and BMP388 barometers
 	
 	The MIT License (MIT)
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -128,9 +125,7 @@ uint8_t Device::readByte(uint8_t subAddress)												// Read a byte from the 
 		spi->beginTransaction(SPISettings(spiClockSpeed, MSBFIRST, SPI_MODE0));		// Read a byte from the sub-address using SPI
 		digitalWrite(cs, LOW);
 		spi->transfer(subAddress | READ_MASK);
-#ifdef BMP388_DEV_h
 		spi->transfer(0x00);																						// Read dummy byte required by BMP388 for SPI
-#endif
 		data = spi->transfer(data);
 		digitalWrite(cs, HIGH);
 		spi->endTransaction();	
@@ -157,16 +152,13 @@ void Device::readBytes(uint8_t subAddress, uint8_t* data, uint16_t count)
 		spi->beginTransaction(SPISettings(spiClockSpeed, MSBFIRST, SPI_MODE0));	// Read "count" bytes into the "data" buffer using SPI
 		digitalWrite(cs, LOW);
 		spi->transfer(subAddress | READ_MASK);
-#ifdef BMP388_DEV_h
 		spi->transfer(0x00);																						// Read dummy byte required by BMP388 for SPI
-#endif
 		spi->transfer(data, count);
 		digitalWrite(cs, HIGH);
 		spi->endTransaction();	
 	}
 }
 
-#ifdef BMP388_DEV_h
 void Device::usingInterrupt(uint8_t pinNumber)											// Wrapper for the SPI usingInterrupt() function
 {
 	spi->usingInterrupt(pinNumber);
@@ -176,4 +168,3 @@ void Device::notUsingInterrupt(uint8_t pinNumber)										// Wrapper for the SP
 {
 	spi->notUsingInterrupt(pinNumber);
 }
-#endif
