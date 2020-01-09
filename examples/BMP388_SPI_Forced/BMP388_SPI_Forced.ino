@@ -11,9 +11,6 @@ void setup()
 {
   Serial.begin(115200);                           // Initialise the serial port
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE 
-  //bmp388.setPresOversampling(OVERSAMPLING_X4);    // Set the pressure oversampling to X4
-  //bmp388.setTempOversampling(OVERSAMPLING_X1);    // Set the temperature oversampling to X1
-  //bmp388.setIIRFilter(IIR_FILTER_4);              // Set the IIR filter to setting 4 
 }
 
 void loop() 
