@@ -269,7 +269,7 @@ uint16_t BMP388_DEV::getFIFOWatermark()															// Retrieve the FIFO water
 	return fifoWatermark;
 }
 
-void BMP388_DEV::setFIFOPressEnable(PressEnable pressEnable)
+void BMP388_DEV::setFIFOPressEnable(PressEnable pressEnable)				// Enable pressure measurements
 {
 	fifo_config_1.bit.fifo_press_en = pressEnable;
 	writeByte(BMP388_FIFO_CONFIG_1, fifo_config_1.reg);
@@ -309,7 +309,7 @@ uint16_t BMP388_DEV::getFIFOLength()																// Get the FIFO length
 uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pressure, 		// Get FIFO data
 																volatile float *altitude, volatile uint32_t &sensorTime)	
 {
-	if (!getFIFOStatus())
+	if (!dataReady())																														// Check if a measurement is ready
 	{
 		return 0;
 	}
@@ -437,33 +437,15 @@ uint8_t BMP388_DEV::dataReady()																			// Check the device mode
 		return 0;
 	}
 	int_status.reg = readByte(BMP388_INT_STATUS);											// Read the interrupt status register
-	if (!int_status.bit.drdy)																					// Check if the data ready flag has been set
+	if (int_status.bit.drdy || int_status.bit.fwm_int)								// Check if the data ready flag or FIFO watermark bit has been set
 	{
-		if (pwr_ctrl.bit.mode == FORCED_MODE)					 									// If we're in FORCED_MODE switch back to SLEEP_MODE
-		{		
-			pwr_ctrl.bit.mode = SLEEP_MODE;	
-		}
-		return 0;
+		return 1;
 	}
-	return 1;																													// A measurement is ready
-}
-
-uint8_t BMP388_DEV::getFIFOStatus()
-{
-	if (pwr_ctrl.bit.mode = SLEEP_MODE)																// If we're in SLEEP_MODE return immediately
-	{
-		return 0;
+	if (pwr_ctrl.bit.mode == FORCED_MODE)					 										// If we're in FORCED_MODE switch back to SLEEP_MODE
+	{		
+		pwr_ctrl.bit.mode = SLEEP_MODE;	
 	}
-	int_status.reg = readByte(BMP388_INT_STATUS);											// Read the interrupt status register	
-	if (!int_status.bit.fwm_int)																			// Check if the data ready flag has been set
-	{
-		if (pwr_ctrl.bit.mode == FORCED_MODE)					 									// If we're in FORCED_MODE switch back to SLEEP_MODE
-		{		
-			pwr_ctrl.bit.mode = SLEEP_MODE;	
-		}
-		return 0;																												// A measurement is ready
-	}
-	return 1;
+	return 0;																													// A measurement is ready
 }
 
 ////////////////////////////////////////////////////////////////////////////////
