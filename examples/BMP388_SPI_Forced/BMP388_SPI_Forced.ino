@@ -25,5 +25,5 @@ void loop()
     Serial.print(altitude);
     Serial.println(F("m"));  
   }
-  delay(1000);
+  delay(1000);																		// Wait for 1 second
 }
