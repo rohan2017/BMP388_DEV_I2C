@@ -52,6 +52,16 @@ void Device::setClock(uint32_t clockSpeed)													// Set the I2C or SPI clo
 	}
 }
 
+void Device::usingInterrupt(uint8_t pinNumber)											// Wrapper for the SPI usingInterrupt() function
+{
+	spi->usingInterrupt(pinNumber);
+}
+
+void Device::notUsingInterrupt(uint8_t pinNumber)										// Wrapper for the SPI notUsingInterrupt() function
+{
+	spi->notUsingInterrupt(pinNumber);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Device I2C & SPI Wrapper (Protected) Member Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,14 +167,4 @@ void Device::readBytes(uint8_t subAddress, uint8_t* data, uint16_t count)
 		digitalWrite(cs, HIGH);
 		spi->endTransaction();	
 	}
-}
-
-void Device::usingInterrupt(uint8_t pinNumber)											// Wrapper for the SPI usingInterrupt() function
-{
-	spi->usingInterrupt(pinNumber);
-}
-
-void Device::notUsingInterrupt(uint8_t pinNumber)										// Wrapper for the SPI notUsingInterrupt() function
-{
-	spi->notUsingInterrupt(pinNumber);
 }
