@@ -48,14 +48,14 @@ class Device{
 		Device(uint8_t cs, uint8_t spiPort, SPIClass& spiClass);		// Device object for ESP32 HSPI operation with supplied SPI object
 #endif		
 		void setClock(uint32_t clockSpeed);													// Set the I2C/SPI clock speed
+		void usingInterrupt(uint8_t pinNumber);											// Wrapper for the SPI.usingInterrupt() function
+		void notUsingInterrupt(uint8_t pinNumber);									// Wrapper for the SPI.notUsingInterrupt() function
 	protected:
 		void initialise();																					// Initialise communications	
 		void setI2CAddress(uint8_t addr);											  		// Set the Device I2C address
 		void writeByte(uint8_t subAddress, uint8_t data);						// I2C and SPI write byte wrapper function
 		uint8_t readByte(uint8_t subAddress);												// I2C and SPI read byte wrapper function
-		void readBytes(uint8_t subAddress, uint8_t* dest, uint16_t count);		// I2C and SPI read bytes wrapper function
-		void usingInterrupt(uint8_t pinNumber);											// Wrapper for the SPI.usingInterrupt() function
-		void notUsingInterrupt(uint8_t pinNumber);									// Wrapper for the SPI.notUsingInterrupt() function	
+		void readBytes(uint8_t subAddress, uint8_t* dest, uint16_t count);		// I2C and SPI read bytes wrapper function		
 	private:
 		Comms comms;																								// Communications bus: I2C or SPI
 		uint8_t address;																						// The device I2C address
@@ -68,5 +68,4 @@ class Device{
 		uint8_t spiPort;																						// SPI port type VSPI or HSPI
 #endif
 };
-
 #endif
