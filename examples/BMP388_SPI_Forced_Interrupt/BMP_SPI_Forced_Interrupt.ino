@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// BMP388_DEV - SPI Communications, Default Configuration, Normal Conversion, Interrupts
+// BMP388_DEV - SPI Communications, Default Configuration, Forced Conversion, Interrupts
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include <BMP388_DEV.h>                             // Include the BMP388_DEV.h library
