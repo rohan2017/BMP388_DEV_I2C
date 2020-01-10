@@ -279,7 +279,8 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		void setMode(Mode mode);																		// Set the barometer mode
 		void setOversamplingRegister(Oversampling presOversampling, // Set the BMP388 oversampling register
 																 Oversampling tempOversamping);		
-		uint8_t dataReady();																				// Checks is a measurement is ready
+		uint8_t dataReady();																				// Checks if a measurement is ready
+		uint8_t fifoReady();																				// Checks if the data FIFO is ready
 		
 		struct {																										// The BMP388 compensation trim parameters (coefficients)
 			uint16_t param_T1;
@@ -424,7 +425,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		} config;
 			
 		float bmp388_compensate_temp(float uncomp_temp); 						// Bosch temperature compensation function																			
-		float bmp388_compensate_press(float uncomp_press, float t_lin); 		// Bosch pressure compensation function																				 
+		float bmp388_compensate_press(float uncomp_press, float t_lin); 		// Bosch pressure compensation function		
 		volatile bool alt_enable;																		// Altitude enable flag
 };
 #endif
