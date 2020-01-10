@@ -416,32 +416,32 @@ To enable FIFO interrupts simply set
 
 Here is the list of the Arduino example sketches:
 
-- BMP388_I2C_Normal.ino : I2C Interface, Normal Mode, Standard I2C Address (0x77)
+- __BMP388_I2C_Normal.ino__ : I2C Interface, Normal Mode, Standard I2C Address (0x77)
 
-- BMP388_I2C_Alt_Normal.ino : I2C Interface, Normal Mode, Alternative I2C Address (0x76)
+- __BMP388_I2C_Alt_Normal.ino__ : I2C Interface, Normal Mode, Alternative I2C Address (0x76)
 
-- BMP388_I2C_Forced.ino : I2C Interface, Forced Mode
+- __BMP388_I2C_Forced.ino__ : I2C Interface, Forced Mode
 
-- BMP388_I2C_Normal_Interrupt.ino : I2C Interface, Normal Mode, Interrupts
+- __BMP388_I2C_Normal_Interrupt.ino__ : I2C Interface, Normal Mode, Interrupts
 
-- BMP388_I2C_Forced_Interrupt.ino : I2C Interface, Forced Mode, Interrupts
+- __BMP388_I2C_Forced_Interrupt.ino__ : I2C Interface, Forced Mode, Interrupts
 
-- BMP388_I2C_Normal_FIFO.ino : I2C Interface, Normal Mode, FIFO Operation
+- __BMP388_I2C_Normal_FIFO.ino__ : I2C Interface, Normal Mode, FIFO Operation
 
-- BMP388_I2C_Normal_Interrupt_FIFO.ino : I2C Interface, Normal Mode, Interrupts, FIFO Operation
+- __BMP388_I2C_Normal_Interrupt_FIFO.ino__ : I2C Interface, Normal Mode, Interrupts, FIFO Operation
 
-- BMP388_SPI_Normal.ino : SPI Interface, Normal Mode
+- __BMP388_SPI_Normal.ino__ : SPI Interface, Normal Mode
 
-- BMP388_SPI_Forced.ino : SPI Interface, Forced Mode
+- __BMP388_SPI_Forced.ino__ : SPI Interface, Forced Mode
 
-- BMP388_SPI_Normal_Interrupt.ino : SPI Interface, Normal Mode, Interrupts
+- __BMP388_SPI_Normal_Interrupt.ino__ : SPI Interface, Normal Mode, Interrupts
 
-- BMP388_SPI_Forced_Interrupt.ino : SPI Interface, Forced Mode, Interrupts
+- __BMP388_SPI_Forced_Interrupt.ino__ : SPI Interface, Forced Mode, Interrupts
 
-- BMP388_SPI_Normal_FIFO.ino : SPI Interface, Normal Mode, FIFO Operation
+- __BMP388_SPI_Normal_FIFO.ino__ : SPI Interface, Normal Mode, FIFO Operation
 
-- BMP388_SPI_Normal_Interrupt_FIFO.ino : SPI Interface, Normal Mode, Interrupts, FIFO Operation
+- __BMP388_SPI_Normal_Interrupt_FIFO.ino__ : SPI Interface, Normal Mode, Interrupts, FIFO Operation
 
-- BMP388_SPI_Normal_Multiple.ino : SPI Interface, Normal Mode, Multiple Devices
+- __BMP388_SPI_Normal_Multiple.ino__ : SPI Interface, Normal Mode, Multiple Devices
 
-- BMP388_ESP32_HSPI_Normal.ino : ESP32 HSPI Internace, Normal Mode
+- __BMP388_ESP32_HSPI_Normal.ino__ : ESP32 HSPI Internace, Normal Mode
