@@ -257,16 +257,16 @@ For more details see code examples provided in the _.../examples/..._ directory.
 ---
 ### __Interrupts__
 
-The BMP388 barometer has an INT output pin that allows measurements to be interrupt driven instead of polling, both in NORMAL and FORCED modes of operation.
+The BMP388 barometer has an INT output pin that enables measurements to be interrupt driven instead of using polling. Interrupts function in both in NORMAL and FORCED modes of operation.
 
-Interrupts are enabled by calling the enable interrupt function with or without parameters. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. UNLATCHED automatically clears the interrupt signal after 2.5ms, while LATCHED remains active until the data is read.
+Interrupts are configured by calling the enable interrupt function with or without parameters. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. UNLATCHED automatically clears the interrupt signal after 2.5ms, while LATCHED remains active until the data is read.
 
 The default settigs are PUSH_PULL, ACTIVE_HIGH and UNLATCHED:
 
 ```
 bmp388.enableInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable interrupts with default settings
 ```
-Alternatively these settings are used if the enable interrupt function is called without any parameters:
+Alternatively, these settings are used if the enable interrupt function is called without any parameters:
 
 ```
 bmp388.enableInterrupt();		// Enable interrupts with default settings
@@ -302,7 +302,7 @@ If the SPI interface is being used and happens to be shared with other devices, 
 bmp388.usingInterrupt(digitalPinToInterrupt(2));     // Invoke the SPI usingInterrupt() function
 ```
 
-The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately not possible to call the results acqusition functions (such as getTemperature(), getPressure() and getMeasurements()) from within the INT pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
+The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately not possible to call the results acqusition functions (such as getTemperature(), getPressure() and getMeasurements()) from within the Interrupt Service Routine (ISR). Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
 
 Here is an example sketch using I2C in NORMAL_MODE, default configuration with interrupts:
 
@@ -434,9 +434,24 @@ The data select option allows the FIFO to store data that UNFILTERED or FILTERED
 ---
 ## __FIFO Operation with Interrupts__ 
 
-In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to indenpendently collect data over a long duration, while the microcontroller is asleep.
+In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to independently collect data over a long duration, while the microcontroller remains asleep.
 
-To enable FIFO interrupts simply set 
+To enable FIFO interrupts simply call the FIFO interrupt function, the parameters are identical to the enable interrupt function with the same default argurments:
+
+```
+bmp388.enableFIFOInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable FIFO interrupts
+```
+Alternatively, this function can also be called with default arguments without specifying any parameters:
+
+```
+bmp388.enableFIFOInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable FIFO interrupts
+```
+
+To disable FIFO interrupts:
+
+```
+bmp388.enableFIFOInterrupt();		// Disable FIFO interrupts
+```
 
 ---
 ## __Example Code__
