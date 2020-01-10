@@ -28,7 +28,9 @@ This BMP388_DEV library offers the following features:
 
 ## __Installation__
 
-After download simply un-zip the file and place the BMP388 directory in your _.../Arduino/libraries/..._ folder. The _.../Arduino/..._ folder is the one where your Arduino IDE sketches are usually located.
+The BMP388_DEV library can be installed using the Arduino IDE's Library Manager. To access the Library Manager, in the Arduino IDE's menu select _Sketch->Include Library->Manage Libraries..._. In the Library Manager's search bar type BMP388 then select the "Install" button in the BMP388_DEV entry.
+
+Alternatively simply download BMP388_DEV from this Github repository, un-zip or extract the files and place the BMP388_DEV directory in your _.../Arduino/libraries/..._ folder. The _.../Arduino/..._ folder is the one where your Arduino IDE sketches are usually located.
 
 ## __Usage__
 
@@ -300,18 +302,19 @@ If the SPI interface is being used and happens to be shared with other devices, 
 bmp388.usingInterrupt(digitalPinToInterrupt(2));     // Invoke the SPI usingInterrupt() function
 ```
 
-The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately therefore not possible to call the results acqusition functions (such as getTemperature(), getPressure() and getMeasurements()) from within the INT pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
+The I2C interface uses the Arduino Wire library. However as the Wire library generates interrupts itself during operation, it is unfortunately not possible to call the results acqusition functions (such as getTemperature(), getPressure() and getMeasurements()) from within the INT pin's Interrupt Service Routine (ISR) itself. Instead a data ready flag is set within the ISR that allows the barometer data to be read in the main loop() function.
 
 Here is an example sketch using I2C in NORMAL_MODE, default configuration with interrupts:
 
 ```
-///////////////////////////////////////////////////////////////////////////////
-// BMP388_DEV - I2C Communications, Default Configuration, Normal Conversion
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+// BMP388_DEV - I2C Communications, Default Configuration, Normal Conversion, Interrupt
+//////////////////////////////////////////////////////////////////////////////////////////
 
 #include <BMP388_DEV.h>                           // Include the BMP388_DEV.h library
 
-volatile boolean dataReady = false;
+volatile boolean dataReady = false;               // Define the data ready flag
+float temperature, pressure, altitude;            // Declare the measurement variables
 
 BMP388_DEV bmp388;                                // Instantiate (create) a BMP388_DEV object and set-up for I2C operation (address 0x77)
 
@@ -321,15 +324,14 @@ void setup()
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE 
   bmp388.enableInterrupt();                       // Enable the BMP388's interrupt (INT) pin
   attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
-  bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
-  bmp388.startNormalConversion();                 // Start BMP388 continuous conversion in NORMAL_MODE  
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);         // Set the standby time to 1.3 seconds * 10 = measurement every 13 seconds
+  bmp388.startNormalConversion();                     // Start BMP388 continuous conversion in NORMAL_MODE 
 }
 
 void loop() 
 {
-  if (dataReady)
-  {
-    float temperature, pressure, altitude;
+  if (dataReady)                                      // Check if data is ready
+  {  
     bmp388.getMeasurements(temperature, pressure, altitude);      // Read the measurements
     Serial.print(temperature);                    // Display the results    
     Serial.print(F("*C   "));
@@ -352,14 +354,14 @@ The SPI interface on the other hand, does allow for the results acquisition func
 Here is an example sketch using SPI in NORMAL_MODE, default configuration with interrupts:
 
 ```
-///////////////////////////////////////////////////////////////////////////////
-// BMP388_DEV - SPI Communications, Default Configuration, Normal Conversion
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+// BMP388_DEV - SPI Communications, Default Configuration, Normal Conversion, Interrupts
+///////////////////////////////////////////////////////////////////////////////////////////
 
 #include <BMP388_DEV.h>                             // Include the BMP388_DEV.h library
 
-volatile boolean dataReady = false;
-volatile float temperature, pressure, altitude;
+volatile boolean dataReady = false;									// Define the data ready flag
+volatile float temperature, pressure, altitude;			// Declare the measurement variables
 
 BMP388_DEV bmp388(10);                              // Instantiate (create) a BMP388_DEV object and set-up for SPI operation on digital pin D10
 
@@ -370,7 +372,7 @@ void setup()
   bmp388.enableInterrupt();                         // Enable the BMP388's interrupt (INT) pin
   bmp388.usingInterrupt(digitalPinToInterrupt(2));  // Invoke the SPI usingInterrupt() function
   attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
-  bmp388.setTimeStandby(TIME_STANDBY_1280MS);       // Set the standby time to 1.2 seconds
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);       // Set the standby time to 1.3 seconds
   bmp388.startNormalConversion();                   // Start BMP388 continuous conversion in NORMAL_MODE 
 }
 
@@ -390,24 +392,49 @@ void loop()
 
 void interruptHandler()                             // Interrupt handler function
 {
-  bmp388.getMeasurements(temperature, pressure, altitude))    // Read the measurement data
+  bmp388.getMeasurements(temperature, pressure, altitude);    // Read the measurement data
   dataReady = true;                                 // Set the data ready flag
 }
 ```
 ---
 ## __FIFO (First In First Out) Operation__ 
 
-The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements.  
+The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements. The FIFO operates in NORMAL_MODE.
 
-To enable the FIFO simply call the enableFIFO() function. By default the BMP388_DEV library always enables temperature, however this function allows parameters to be changed. The parameters include enabling pressure (PRESS_ENABLE), sensor time (TIME_ENABLE), sub
+To enable the FIFO simply call the enableFIFO() function: 
 
-The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample
+```
+bmp388.enableFIFO();		// Enable the BMP388's FIFO operation
+```
+To disable the FIFO:
+
+```
+bmp388.disableFIFO();		// Disable the BMP388's FIFO
+```
+
+By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time, however this function allows these and other parameters to be changed. The parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
+
+```
+bmp388.enableFIFO(PRES_ENABLE, ALT_ENABLE, SUBSAMPLETIME_OFF, FILTERED);
+```
+
+```
+
+```
+
+```
+
+```
+
+The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample.
+
+The data select option allows the FIFO to store data that UNFILTERED or FILTERED
 
 
 ---
 ## __FIFO Operation with Interrupts__ 
 
-The BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. In NORMAL_MODE this is extremely useful for ultra low power applications, since it allows the barometer to indendently collect data over a long duration, while the microcontroller is asleep. The barometer's interrupt signal is then used to wake up the microcontroller, so that it can acquire and process the data.
+In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to indenpendently collect data over a long duration, while the microcontroller is asleep.
 
 To enable FIFO interrupts simply set 
 
@@ -444,4 +471,4 @@ Here is the list of the Arduino example sketches:
 
 - __BMP388_SPI_Normal_Multiple.ino__ : SPI Interface, Normal Mode, Multiple Devices
 
-- __BMP388_ESP32_HSPI_Normal.ino__ : ESP32 HSPI Internace, Normal Mode
+- __BMP388_ESP32_HSPI_Normal.ino__ : ESP32 HSPI Interface, Normal Mode
