@@ -74,8 +74,6 @@ uint8_t BMP388_DEV::begin(Mode mode, 																// Initialise BMP388 device
 	pwr_ctrl.bit.press_en = 1;																				// Set power control register to enable pressure sensor
 	pwr_ctrl.bit.temp_en = 1;																					// Set power control register to enable temperature sensor
 	setMode(mode);																										// Set the BMP388 mode
-	pinMode(7, OUTPUT);
-	pinMode(6, OUTPUT);
 	return 1;																													// Report successful initialisation
 }
 
@@ -239,7 +237,7 @@ void BMP388_DEV::enableFIFO(PressEnable pressEnable,								// Enable the FIFO, 
 
 void BMP388_DEV::disableFIFO()																			// Disable the FIFO
 {
-	fifo_config_1.bit.fifo_mode = 1;
+	fifo_config_1.bit.fifo_mode = 0;
 	writeByte(BMP388_FIFO_CONFIG_1, fifo_config_1.reg);
 }
 
@@ -315,7 +313,6 @@ uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pre
 	{
 		return 0;
 	}
-	digitalWrite(7, HIGH);
 	bool configError = false;																										// Set the configuration error flag
 	uint16_t fifoLength = getFIFOLength() + fifo_config_1.bit.fifo_time_en + 		// Get the FIFO length plus sensor time bits if required
 												3 * fifo_config_1.bit.fifo_time_en;
@@ -366,7 +363,6 @@ uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pre
 				break;
 		}
 	}
-	digitalWrite(7, LOW);
 	return configError ? 2 : 1;
 }
 
