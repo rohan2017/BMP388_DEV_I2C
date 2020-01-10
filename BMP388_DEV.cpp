@@ -74,6 +74,8 @@ uint8_t BMP388_DEV::begin(Mode mode, 																// Initialise BMP388 device
 	pwr_ctrl.bit.press_en = 1;																				// Set power control register to enable pressure sensor
 	pwr_ctrl.bit.temp_en = 1;																					// Set power control register to enable temperature sensor
 	setMode(mode);																										// Set the BMP388 mode
+	pinMode(7, OUTPUT);
+	pinMode(6, OUTPUT);
 	return 1;																													// Report successful initialisation
 }
 
@@ -156,7 +158,7 @@ uint8_t BMP388_DEV::getTempPres(volatile float &temperature, 				// Get the temp
 																volatile float &pressure)	
 {
 	if (!dataReady())																									// Check if a measurement is ready
-	{
+	{	
 		return 0;
 	}
 	uint8_t data[6];                                                  // Create a data buffer
@@ -309,10 +311,11 @@ uint16_t BMP388_DEV::getFIFOLength()																// Get the FIFO length
 uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pressure, 		// Get FIFO data
 																volatile float *altitude, volatile uint32_t &sensorTime)	
 {
-	if (!dataReady())																														// Check if a measurement is ready
+	if (!fifoReady())																														// Check if the FIFO data is ready
 	{
 		return 0;
 	}
+	digitalWrite(7, HIGH);
 	bool configError = false;																										// Set the configuration error flag
 	uint16_t fifoLength = getFIFOLength() + fifo_config_1.bit.fifo_time_en + 		// Get the FIFO length plus sensor time bits if required
 												3 * fifo_config_1.bit.fifo_time_en;
@@ -363,6 +366,7 @@ uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pre
 				break;
 		}
 	}
+	digitalWrite(7, LOW);
 	return configError ? 2 : 1;
 }
 
@@ -430,22 +434,33 @@ void BMP388_DEV::setOversamplingRegister(Oversampling presOversampling,  // Set 
 	writeByte(BMP388_OSR, osr.reg);                              
 }
 
-uint8_t BMP388_DEV::dataReady()																			// Check the device mode
+uint8_t BMP388_DEV::dataReady()																			// Check if measurement data is ready
 {		
-	if (pwr_ctrl.bit.mode = SLEEP_MODE)																// If we're in SLEEP_MODE return immediately
+	if (pwr_ctrl.bit.mode == SLEEP_MODE)															// If we're in SLEEP_MODE return immediately
 	{
 		return 0;
 	}
 	int_status.reg = readByte(BMP388_INT_STATUS);											// Read the interrupt status register
-	if (int_status.bit.drdy || int_status.bit.fwm_int)								// Check if the data ready flag or FIFO watermark bit has been set
+	if (int_status.bit.drdy)																					// Check if the data ready flag has been cleared
 	{
-		return 1;
+		if (pwr_ctrl.bit.mode == FORCED_MODE)					 									// If we're in FORCED_MODE switch back to SLEEP_MODE
+		{		
+			pwr_ctrl.bit.mode = SLEEP_MODE;	
+		}
+		return 1;																												// The measurement is ready
 	}
-	if (pwr_ctrl.bit.mode == FORCED_MODE)					 										// If we're in FORCED_MODE switch back to SLEEP_MODE
-	{		
-		pwr_ctrl.bit.mode = SLEEP_MODE;	
+	return 0;																													// The measurement is still pending
+}
+
+uint8_t BMP388_DEV::fifoReady()																			// Check if the FIFO data is ready
+{		
+	if (pwr_ctrl.bit.mode == SLEEP_MODE)															// If we're in SLEEP_MODE return immediately
+	{
+		return 0;
 	}
-	return 0;																													// A measurement is ready
+	int_status.reg = readByte(BMP388_INT_STATUS);											// Read the interrupt status register
+	// If the barometer is in NORMAL_MODE and both the data ready and FIFO ready flags have been set return 1, otherwise return 0
+	return pwr_ctrl.bit.mode == NORMAL_MODE ? int_status.bit.drdy && int_status.bit.fwm_int : 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
