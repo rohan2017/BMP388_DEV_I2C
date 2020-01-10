@@ -414,33 +414,34 @@ To enable FIFO interrupts simply set
 ---
 ## __Example Code__
 
-- I2C Normal Mode: 1.3 second automatic sampling rate with default settings
+Here is the list of the Arduino example sketches:
 
-- I2C Normal Mode: (Alterntive I2C Address): 1.3 second automatic sampling rate with default settings
+- BMP388_I2C_Normal.ino : I2C Interface, Normal Mode, Standard I2C Address (0x77)
 
-- I2C Forced Mode: 1 second manual sampling rate with default settings
+- BMP388_I2C_Alt_Normal.ino : I2C Interface, Normal Mode, Alternative I2C Address (0x76)
 
-- SPI Normal Mode: 1.3 second automatic sampling rate with default settings
+- BMP388_I2C_Forced.ino : I2C Interface, Forced Mode
 
-- SPI Forced Mode: 1 second manual sampling rate with default settings
+- BMP388_I2C_Normal_Interrupt.ino : I2C Interface, Normal Mode, Interrupts
 
-- ESP32 HSPI Normal Mode: 1.3 second automatic sampling rate with default settings
+- BMP388_I2C_Forced_Interrupt.ino : I2C Interface, Forced Mode, Interrupts
 
-- SPI Normal Mode Multiple: 1.3 second automatic sampling of multiple BMP388 with default settings
+- BMP388_I2C_Normal_FIFO.ino : I2C Interface, Normal Mode, FIFO Operation
 
-- I2C Normal Mode and Interrupts: 1.3 second automatic sampling rate with default settings
+- BMP388_I2C_Normal_Interrupt_FIFO.ino : I2C Interface, Normal Mode, Interrupts, FIFO Operation
 
-- I2C Forced Mode and Interrupts: 1 second manual sampling with default settings
+- BMP388_SPI_Normal.ino : SPI Interface, Normal Mode
 
-- SPI Normal Mode and Interrupts: 1.3 second automatic sampling rate with default settings
+- BMP388_SPI_Forced.ino : SPI Interface, Forced Mode
 
-- SPI Forced Mode and Interrupts: 1 second manual sampling rate with default settings
+- BMP388_SPI_Normal_Interrupt.ino : SPI Interface, Normal Mode, Interrupts
 
-- I2C Normal Mode and FIFO : store 10 measurements at 1.3 second automatic sampling rate with default settings
+- BMP388_SPI_Forced_Interrupt.ino : SPI Interface, Forced Mode, Interrupts
 
-- I2C Forced Mode and FIFO : store 10 measurements at 1 second manual sampling rate with default settings
+- BMP388_SPI_Normal_FIFO.ino : SPI Interface, Normal Mode, FIFO Operation
 
-- SPI Normal Mode and FIFO : store 10 measurements, sampling at 1.3 seconds standby time intervals with default settings
+- BMP388_SPI_Normal_Interrupt_FIFO.ino : SPI Interface, Normal Mode, Interrupts, FIFO Operation
 
-- SPI Forced Mode and FIFO : store 10 measurements with default settings
+- BMP388_SPI_Normal_Multiple.ino : SPI Interface, Normal Mode, Multiple Devices
 
+- BMP388_ESP32_HSPI_Normal.ino : ESP32 HSPI Internace, Normal Mode
