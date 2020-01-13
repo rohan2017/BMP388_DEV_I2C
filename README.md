@@ -16,7 +16,11 @@ This BMP388_DEV library offers the following features:
 - In NORMAL mode barometer returns results at the specified standby time interval
 - Highly configurable, allows for changes to pressure and temperature oversampling, IIR filter and standby time
 - Polling or interrupt driven measurements (using the BMP388's external INT pin)
-- Storage and burst reading of up to 70 temperature and pressure measurements using the BMP388's internal 512KB FIFO memory
+- Storage and burst reading of up to 72 temperature and pressure measurements using the BMP388's internal 512 byte FIFO memory
+
+##__Contents__
+
+Version
 
 ## __Version__
 
@@ -72,13 +76,13 @@ bmp388.setClock(4000000);			// Set the SPI clock to 4MHz
 ---
 ### __Device Initialisation__
 
-To initialise the BMP388 it is necessary to call the begin() function with or without parameters. The parameters specify the starting mode, pressure/temperature oversampling, IIR filter and standby time options respectively:
+To initialise the BMP388 it is necessary to call the begin() function with or without arguments. The parameters specify the starting mode, pressure/temperature oversampling, IIR filter and standby time options respectively:
 
 ```
 bmp388.begin(SLEEP_MODE, OVERSAMPLING_X16, OVERSAMPLING_X2, IIR_FILTER_4, TIME_STANDBY_5MS);
 ```
 
-Alternatively simply call the begin function without any paremeters, this sets up the default configuration: SLEEP_MODE, pressure oversampling X16, temperature oversampling X2, IIR filter OFF and a standby time of 5ms:
+Alternatively simply call the begin function without any arguments, this sets up the default configuration: SLEEP_MODE, pressure oversampling X16, temperature oversampling X2, IIR filter OFF and a standby time of 5ms:
 
 ```
 bmp388.begin();	// Initialise the BMP388 with default configuration
@@ -259,14 +263,15 @@ For more details see code examples provided in the _.../examples/..._ directory.
 
 The BMP388 barometer has an INT output pin that enables measurements to be interrupt driven instead of using polling. Interrupts function in both in NORMAL and FORCED modes of operation.
 
-Interrupts are configured by calling the enable interrupt function with or without parameters. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. UNLATCHED automatically clears the interrupt signal after 2.5ms, while LATCHED remains active until the data is read.
+Interrupts are configured by calling the enable interrupt function with or without arguments. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. In UNLATCHED mode the interrupt signal automatically clears after 2.5ms, while in LATCHED mode the interrupt signal remains active until the data is read.
 
-The default settigs are PUSH_PULL, ACTIVE_HIGH and UNLATCHED:
+The default settings are PUSH_PULL, ACTIVE_HIGH and UNLATCHED:
 
 ```
 bmp388.enableInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable interrupts with default settings
 ```
-Alternatively, these settings are used if the enable interrupt function is called without any parameters:
+
+Alternatively the enable interrupt function with default settings can be called without any arguments:
 
 ```
 bmp388.enableInterrupt();		// Enable interrupts with default settings
@@ -290,7 +295,7 @@ bmp388.setIntActiveLevel(ACTIVE_LOW);		// Set the interrupt signal's active leve
 bmp388.setIntLatchConfig(LATCHED);		// Set the interrupt signal to latch until cleared
 ```
 
-Attaching the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function:
+Attaching the Arduino microcontroller the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function:
 
 ```
 attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
@@ -399,18 +404,7 @@ void interruptHandler()                             // Interrupt handler functio
 ---
 ## __FIFO (First In First Out) Operation__ 
 
-The BMP388 barometer contains a 512KB FIFO memory, capable if storing and burst reading up to 70 temperature and pressure measurements. The FIFO operates in NORMAL_MODE.
-
-To enable the FIFO simply call the enableFIFO() function: 
-
-```
-bmp388.enableFIFO();		// Enable the BMP388's FIFO operation
-```
-To disable the FIFO:
-
-```
-bmp388.disableFIFO();		// Disable the BMP388's FIFO
-```
+The BMP388 barometer contains a 512 byte FIFO memory, capable of storing and burst reading up to 72 temperature and pressure measurements in NORMAL_MODE.
 
 By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time, however this function allows these and other parameters to be changed. The parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
 
@@ -418,12 +412,58 @@ By default the BMP388_DEV library always enables temperature, pressure, altitude
 bmp388.enableFIFO(PRES_ENABLE, ALT_ENABLE, SUBSAMPLETIME_OFF, FILTERED);
 ```
 
+Alternatively, to enable the FIFO with default settings and without arguments: 
+
+```
+bmp388.enableFIFO();		// Enable the BMP388's FIFO operation
+```
+
+To disable the FIFO:
+
+```
+bmp388.disableFIFO();		// Disable the BMP388's FIFO
+```
+
+It is also possible to change the FIFO settings independently:
+
+```
+bmp388.setFIFOPressEnable(PRESS_ENABLED);		// Enable FIFO pressure measurements, options: PRESS_DISABLED, PRESS_ENABLED
 ```
 
 ```
-
+bmp388.setFIFOAltEnable(ALT_ENABLED);		// Enable FIFO altitude measurements, options: ALT_DISABLED, ALT_ENABLED
 ```
 
+```
+bmp388.setFIFOTimeEnable(TIME_ENABLED);		// Enable FIFO sensor time, options: IME_DISABLED, TIME_ENABLED
+```
+
+```
+bmp388.SetFIFOSubSampling(SUBSAMPING_OFF);	 // Enable FIFO sub-sampling, options: SUBSAMPING_OFF, DIV2, DIV4, DIV8, DIV16, DIV32, DIV64, DIV128
+```
+
+```
+bmp388.SetDataSelect(FILTERED);		// Set FIFO to store unfiltered or filtered data, options UNFILITERED, FILTERED
+```
+
+```
+bmp388.StopFIFOOnFull(STOP_ON_FULL_ENABLED);	// Set FIFO to stop when full, options: UNFILTERED, FILTERED
+```
+
+To specify the number of measurements required:
+
+```
+bmp388.setFIFONoOfMeasurements(10);		// Calculate the size of the FIFO required to store 10 measurements
+```
+
+This function above calculates the size in bytes required to store the specified number of either temperature or temperature and pressure meaurements. If the allocation 
+
+
+In order to check if 
+```
+
+
+bmp388.getFifoData(
 ```
 
 The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample.
@@ -451,6 +491,20 @@ To disable FIFO interrupts:
 
 ```
 bmp388.enableFIFOInterrupt();		// Disable FIFO interrupts
+```
+
+It is also possible to change the FIFO interrupt settings independently:
+
+```
+
+```
+
+```
+
+```
+
+```
+
 ```
 
 ---
