@@ -37,9 +37,6 @@
 #define DEVICE_ID 						0x50				// The BMP388 device ID
 #define RESET_CODE						0xB6				// The BMP388 reset code
 #define FIFO_FLUSH						0xB0				// The BMP388 flush FIFO code
-#define FIFO_SIZE							0x01FF			// The BMP388 FIFO size
-#define MAX_PACKET_SIZE				7						// The BMP388 maximum data packet size
-#define SEA_LEVEL_PRESSURE 		1013.23f		// Pressure at sea level
 
 enum SPIPort { BMP388_SPI0, BMP388_SPI1 };
 
@@ -429,5 +426,8 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		float bmp388_compensate_temp(float uncomp_temp); 						// Bosch temperature compensation function																			
 		float bmp388_compensate_press(float uncomp_press, float t_lin); 		// Bosch pressure compensation function		
 		volatile bool alt_enable;																		// Altitude enable flag
+		const uint16_t FIFO_SIZE = 0x01FF;													// The BMP388 FIFO size 512 bytes
+		const uint8_t MAX_PACKET_SIZE = 7;													// The BMP388 maximum FIFO packet size in bytes
+		const float SEA_LEVEL_PRESSURE = 1013.23f;									// Pressure at sea level
 };
 #endif
