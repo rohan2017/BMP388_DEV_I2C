@@ -18,7 +18,7 @@ This BMP388_DEV library offers the following features:
 - Polling or interrupt driven measurements (using the BMP388's external INT pin)
 - Storage and burst reading of up to 72 temperature and pressure measurements using the BMP388's internal 512 byte FIFO memory
 
-##__Contents__
+## __Contents__
 
 Version
 
@@ -406,10 +406,14 @@ void interruptHandler()                             // Interrupt handler functio
 
 The BMP388 barometer contains a 512 byte FIFO memory, capable of storing and burst reading up to 72 temperature and pressure measurements in NORMAL_MODE.
 
-By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time, however this function allows these and other parameters to be changed. The parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
+By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time. Sensor time is the internal timing of the BMP388 barometer, the datasheet however does not specify the time's units. Additional p
+
+Subsampling divides down the FIFO sampling rate down further with the settings from OFF, DIV2, DIV4,...DIV128. Data select determines whether the data placed in the FIFO is unfiltered or filtered by the IIR filter.
+
+The parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
 
 ```
-bmp388.enableFIFO(PRES_ENABLE, ALT_ENABLE, SUBSAMPLETIME_OFF, FILTERED);
+bmp388.enableFIFO(PRES_ENABLED, ALT_ENABLED, TIME_ENABLED, SUBSAMPLETIME_OFF, FILTERED);	// Enable FIFO with default argurments
 ```
 
 Alternatively, to enable the FIFO with default settings and without arguments: 
@@ -453,17 +457,26 @@ bmp388.StopFIFOOnFull(STOP_ON_FULL_ENABLED);	// Set FIFO to stop when full, opti
 To specify the number of measurements required:
 
 ```
-bmp388.setFIFONoOfMeasurements(10);		// Calculate the size of the FIFO required to store 10 measurements
+bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS);		// Calculate the size of the FIFO required to store the measurements
 ```
+The maximum number of measurements for temperature and pressure is 72 and for temperature alone is 126.
 
-This function above calculates the size in bytes required to store the specified number of either temperature or temperature and pressure meaurements. If the allocation 
+This function above calculates the FIFO size in bytes required to store the specified number of either temperature or temperature and pressure meaurements. If the memory allocation + sensortime (4 bytes) + overhead (2 bytes) exceeds the size of the FIFO it returns 0 or failure, oth
 
-
-In order to check if 
+To check if the FIFO measurements are ready the getFIFOData() function can be polled. The function returns 1 if the measurements are ready, 0 if they are still pending. The parameters include float pointers to temperature, pressure and altitude arrays, as well the sensorTime append to each batch of measurements that is a uint32_t (unsigned long) variable passed by reference:
 ```
+if (bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime)
+{
+	// The FIFO measurements are ready
+}
+```
+The float arrays are decleared whose size (number of indices) matches the number of measurements:
 
-
-bmp388.getFifoData(
+```
+float temperature[NO_OF_MEASUREMENTS];              // Create the temperature, pressure and altitude array variables
+float pressure[NO_OF_MEASUREMENTS];
+float altitude[NO_OF_MEASUREMENTS];
+uint32_t sensorTime;                                // Sensor time
 ```
 
 The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample.
@@ -505,6 +518,14 @@ It is also possible to change the FIFO interrupt settings independently:
 
 ```
 
+```
+As  float arrays are decleared whose size (number of indices) matches the number of measurements:
+
+```
+float temperature[NO_OF_MEASUREMENTS];              // Create the temperature, pressure and altitude array variables
+float pressure[NO_OF_MEASUREMENTS];
+float altitude[NO_OF_MEASUREMENTS];
+uint32_t sensorTime;                                // Sensor time
 ```
 
 ---
