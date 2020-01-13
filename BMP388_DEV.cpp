@@ -251,7 +251,8 @@ uint8_t BMP388_DEV::setFIFONoOfMeasurements(uint16_t noOfMeasurements) 		// Set 
 
 uint8_t BMP388_DEV::setFIFOWatermark(uint16_t fifoWatermark)				// Set the FIFO watermark
 {
-	if (fifoWatermark > FIFO_SIZE)																		// The no of measurements is too large for the FIFO
+	if (fifoWatermark + fifo_config_1.bit.fifo_time_en +  						// Check if the FIFO watermark + appended sensor time (4 bytes) 
+			3 * fifo_config_1.bit.fifo_time_en + 2 > FIFO_SIZE)						// if enabled + 2 byte overhead is larger than the FIFO size of 512 bytes
 	{
 		return 0;																												// FIFO watermark larger than FIFO, return error
 	}
