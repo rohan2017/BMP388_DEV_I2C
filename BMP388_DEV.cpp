@@ -220,7 +220,7 @@ void BMP388_DEV::setIntLatchConfig(LatchConfig latchConfig)					// Set the inter
 	writeByte(BMP388_INT_CTRL, int_ctrl.reg);
 }
 
-void BMP388_DEV::enableFIFO(PressEnable pressEnable,								// Enable the FIFO, without specifying the number of measurements
+void BMP388_DEV::enableFIFO(PressEnable pressEnable,								// Enable the FIFO
 														AltEnable altEnable,
 														TimeEnable timeEnable,
 														Subsampling subsampling,
