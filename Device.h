@@ -55,7 +55,7 @@ class Device{
 		void setI2CAddress(uint8_t addr);											  		// Set the Device I2C address
 		void writeByte(uint8_t subAddress, uint8_t data);						// I2C and SPI write byte wrapper function
 		uint8_t readByte(uint8_t subAddress);												// I2C and SPI read byte wrapper function
-		void readBytes(uint8_t subAddress, uint8_t* dest, uint16_t count);		// I2C and SPI read bytes wrapper function		
+		void readBytes(uint8_t subAddress, uint8_t* dest, uint16_t count);		// I2C and SPI read bytes wrapper function	
 	private:
 		Comms comms;																								// Communications bus: I2C or SPI
 		uint8_t address;																						// The device I2C address
