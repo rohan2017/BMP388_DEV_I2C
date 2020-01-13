@@ -38,6 +38,7 @@
 #define RESET_CODE						0xB6				// The BMP388 reset code
 #define FIFO_FLUSH						0xB0				// The BMP388 flush FIFO code
 #define FIFO_SIZE							0x01FF			// The BMP388 FIFO size
+#define MAX_PACKET_SIZE				7						// The BMP388 maximum data packet size
 #define SEA_LEVEL_PRESSURE 		1013.23f		// Pressure at sea level
 
 enum SPIPort { BMP388_SPI0, BMP388_SPI1 };
@@ -194,12 +195,13 @@ enum HeaderCode {													// FIFO header codes
 	FIFO_SENSOR_PRESS			 = 0x94
 };
 
-enum InterruptStatus {										// FIFO interrupt status
-	FIFO_DATA_READY				 = 0x01,
-	FIFO_FULL							 = 0x02
+enum FIFOStatus {													// FIFO status
+	DATA_PENDING			 		 = 0x00,
+	DATA_READY				 		 = 0X01,
+	CONFIG_ERROR			 		 = 0x02
 };
 
-enum WatchdogTimout {											// I2C watchdog timeout
+enum WatchdogTimout {											// I2C watchdog time-out
 	WATCHDOG_TIMEOUT_1MS	 = 0x00,
 	WATCHDOG_TIMEOUT_40MS	 = 0x01
 };
@@ -261,10 +263,10 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		void setFIFODataSelect(DataSelect dataSelect);							// Set the if the FIFO data is unfiltered or filtered
 		void setFIFOStopOnFull(StopOnFull stopOnFull);							// Set the FIFO stop on full configuration
 		uint16_t getFIFOLength();																		// Get the FIFO length	
-		uint8_t getFIFOData(volatile float *temperature, 						// Get FIFO data 
-												volatile float *pressure, 		
-												volatile float *altitude, 
-												volatile uint32_t &sensorTime);	
+		FIFOStatus getFIFOData(volatile float *temperature, 				// Get FIFO data 
+													 volatile float *pressure, 		
+													 volatile float *altitude, 
+													 volatile uint32_t &sensorTime);	
 		void enableFIFOInterrupt(OutputDrive outputDrive = PUSH_PULL, 	// Enable FIFO interrupt
 														 ActiveLevel activeLevel = ACTIVE_HIGH,
 														 LatchConfig latchConfig = UNLATCHED);												
