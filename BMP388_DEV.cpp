@@ -306,49 +306,51 @@ uint16_t BMP388_DEV::getFIFOLength()																// Get the FIFO length
 	return fifoLength;
 }
 
-uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pressure, 		// Get FIFO data
-																volatile float *altitude, volatile uint32_t &sensorTime)	
+FIFOStatus BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pressure, 		// Get FIFO data
+																	 volatile float *altitude, volatile uint32_t &sensorTime)	
 {
 	if (!fifoReady())																														// Check if the FIFO data is ready
 	{
-		return 0;
+		return DATA_PENDING;																											// Return if the measurements are pending
 	}
 	bool configError = false;																										// Set the configuration error flag
 	uint16_t fifoLength = getFIFOLength() + fifo_config_1.bit.fifo_time_en + 		// Get the FIFO length plus sensor time bits if required
 												3 * fifo_config_1.bit.fifo_time_en;
-	uint8_t data[fifoLength];																										// Create a buffer for the incoming data on the stack
-	readBytes(BMP388_FIFO_DATA, &data[0], sizeof(data));												// Read in the data from the BMP388's FIFO
 	uint16_t count = 0;																													// Initialise the byte count
 	uint16_t measCount = 0;																											// Initialise the measurement count
-	while (count < fifoLength)																									// Parse the FIFO data until it is empty
+	uint8_t packetSize = (fifo_config_1.bit.fifo_press_en | fifo_config_1.bit.fifo_temp_en) + 		// Determine the size of the data packets		
+												3 * fifo_config_1.bit.fifo_press_en + 3 * fifo_config_1.bit.fifo_temp_en;
+	uint8_t data[MAX_PACKET_SIZE];																							// Declare data packet memory
+	while (count < fifoLength)																									// Parse the data until the FIFO is empty
 	{
-		uint8_t header = data[count++];																						// Acquire the data header
+		readBytes(BMP388_FIFO_DATA, &data[0], packetSize);												// Acquire the next data packet
+		uint8_t header = data[0];																									// Acquire the data header
 		int32_t adcTemp, adcPres;																									// Declare the raw temperature and pressure variables
 		switch(header)
 		{
 			case FIFO_SENSOR_PRESS:																									// Header indicates that temperature and pressure data follows
-				adcTemp = (int32_t)data[count + 2] << 16 | (int32_t)data[count + 1] << 8 | (int32_t)data[count];  // Copy the temperature and pressure data into the adc variables
-				*(temperature + measCount) = bmp388_compensate_temp((float)adcTemp);   					// Temperature compensation (function from BMP388 datasheet)
-				adcPres = (int32_t)data[count + 5] << 16 | (int32_t)data[count + 4] << 8 | (int32_t)data[count + 3];
-				*(pressure + measCount) = bmp388_compensate_press((float)adcPres, *(temperature + measCount)); 	// Pressure compensation (function from BMP388 datasheet)
-				*(pressure + measCount) /= 100.0f;
-				if (alt_enable)
+				adcTemp = (int32_t)data[3] << 16 | (int32_t)data[2] << 8 | (int32_t)data[1];  // Copy the temperature and pressure data into the adc variables
+				temperature[measCount] = bmp388_compensate_temp((float)adcTemp);   					// Temperature compensation (function from BMP388 datasheet)
+				adcPres = (int32_t)data[6] << 16 | (int32_t)data[5] << 8 | (int32_t)data[4];
+				pressure[measCount] = bmp388_compensate_press((float)adcPres, temperature[measCount]); 	// Pressure compensation (function from BMP388 datasheet)
+				pressure[measCount] /= 100.0f;
+				if (alt_enable)																												// Check if altitude measurements have been enabled
 				{
-					*(altitude + measCount) = ((float)powf(SEA_LEVEL_PRESSURE / *(pressure + measCount), 0.190223f) - 1.0f) * 	// Calculate the altitude in metres 
-						(*(temperature + measCount)  + 273.15f) / 0.0065f; 
+					altitude[measCount] = ((float)powf(SEA_LEVEL_PRESSURE / pressure[measCount], 0.190223f) - 1.0f) * 	// Calculate the altitude in metres 
+						(temperature[measCount]  + 273.15f) / 0.0065f; 
 				}
 				count += 6;																														// Increment the byte count by the size of the data payload
 				measCount++;																													// Increment the measurement count
 				break;
 			case FIFO_SENSOR_TEMP:																									// Header indicates that temperature data follows
-				adcTemp = (int32_t)data[count + 2] << 16 | (int32_t)data[count + 1] << 8 | (int32_t)data[count];  // Copy the temperature and pressure data into the adc variables
-				*(temperature + measCount) = bmp388_compensate_temp((float)adcTemp);   					// Temperature compensation (function from BMP388 datasheet)
+				adcTemp = (int32_t)data[3] << 16 | (int32_t)data[2] << 8 | (int32_t)data[1];  // Copy the temperature and pressure data into the adc variables
+				temperature[measCount] = bmp388_compensate_temp((float)adcTemp);   					// Temperature compensation (function from BMP388 datasheet)
 				count += 3;																														// Increment the byte count by the size of the data payload
 				measCount++;																													// Increment the measurement count
 				break;
 			case FIFO_SENSOR_TIME:																									// Header indicates that sensor time follows
 				// Sensor time isn't actually stored in the FIFO, but is appended once the FIFO is read
-				sensorTime = (uint32_t)data[count + 2] << 16 | (uint32_t)data[count + 1] << 8 | (uint32_t)data[count];	// Read the sensor time
+				sensorTime = (uint32_t)data[3] << 16 | (uint32_t)data[1] << 8 | (uint32_t)data[1];	// Read the sensor time
 				count += 3;																														// Increment the byte count by the size of the data payload
 				break;
 			case FIFO_CONFIG_CHANGE:																								// Header indicates that configuration change or FIFO empty data follows
@@ -363,7 +365,7 @@ uint8_t BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *pre
 				break;
 		}
 	}
-	return configError ? 2 : 1;
+	return configError ? CONFIG_ERROR : DATA_READY;															// Indicate that the measurements are ready, (or if a config error occured)
 }
 
 void BMP388_DEV::enableFIFOInterrupt(OutputDrive outputDrive, 			// Enable the BMP388's FIFO interrupts on the INT pin
@@ -450,13 +452,7 @@ uint8_t BMP388_DEV::dataReady()																			// Check if measurement data i
 
 uint8_t BMP388_DEV::fifoReady()																			// Check if the FIFO data is ready
 {		
-	if (pwr_ctrl.bit.mode == SLEEP_MODE)															// If we're in SLEEP_MODE return immediately
-	{
-		return 0;
-	}
-	int_status.reg = readByte(BMP388_INT_STATUS);											// Read the interrupt status register
-	// If the barometer is in NORMAL_MODE and both the data ready and FIFO ready flags have been set return 1, otherwise return 0
-	return pwr_ctrl.bit.mode == NORMAL_MODE ? int_status.bit.drdy && int_status.bit.fwm_int : 0;
+	return dataReady() && int_status.bit.fwm_int ? 1 : 0;							// Return 1 if a FIFO measurement is ready, otherwise 0
 }
 
 ////////////////////////////////////////////////////////////////////////////////
