@@ -182,15 +182,6 @@ enum StopOnFull {													// FIFO stop on full configuration
 	STOP_ON_FULL_DISABLED	 = 0x00,
 	STOP_ON_FULL_ENABLED 	 = 0x01
 };
-	
-enum HeaderCode {													// FIFO header codes
-	FIFO_EMPTY					   = 0x80,
-	FIFO_CONFIG_ERROR			 = 0x44,
-	FIFO_CONFIG_CHANGE		 = 0x48,
-	FIFO_SENSOR_TIME			 = 0xA0,
-	FIFO_SENSOR_TEMP			 = 0x90,
-	FIFO_SENSOR_PRESS			 = 0x94
-};
 
 enum FIFOStatus {													// FIFO status
 	DATA_PENDING			 		 = 0x00,
@@ -280,6 +271,15 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 																 Oversampling tempOversamping);		
 		uint8_t dataReady();																				// Checks if a measurement is ready
 		uint8_t fifoReady();																				// Checks if the data FIFO is ready
+		
+		enum HeaderCode {																						// FIFO header codes
+			FIFO_EMPTY					   = 0x80,
+			FIFO_CONFIG_ERROR			 = 0x44,
+			FIFO_CONFIG_CHANGE		 = 0x48,
+			FIFO_SENSOR_TIME			 = 0xA0,
+			FIFO_SENSOR_TEMP			 = 0x90,
+			FIFO_SENSOR_PRESS			 = 0x94
+		};
 		
 		struct {																										// The BMP388 compensation trim parameters (coefficients)
 			uint16_t param_T1;
