@@ -26,27 +26,27 @@ This BMP388_DEV library offers the following features:
 3. [Usage](#usage)
 		 1. [BMP388_DEV Library](#bmp388_dev_library)
 	
-<a name="version"/>
+<a name="version"></a>
 ## __Version__
 
 - Version 1.0.0 -- Intial version
 
-<a name="arduino_compatibility"/>
+<a name="arduino_compatibility"></a>
 ## __Arduino Compatibility__
 
 - All Arduino boards, but for 5V Arduino boards (such as the Uno, Nano, Mega, Leonardo, etc...), please check if the BMP388 breakout board requires a 5V to +3.3V voltage level shifter
 
-<a name="installation"/>
+<a name="installation"></a>
 ## __Installation__
 
 The BMP388_DEV library can be installed using the Arduino IDE's Library Manager. To access the Library Manager, in the Arduino IDE's menu select _Sketch->Include Library->Manage Libraries..._. In the Library Manager's search bar type BMP388 then select the "Install" button in the BMP388_DEV entry.
 
 Alternatively simply download BMP388_DEV from this Github repository, un-zip or extract the files and place the BMP388_DEV directory in your _.../Arduino/libraries/..._ folder. The _.../Arduino/..._ folder is the one where your Arduino IDE sketches are usually located.
 
-<a name="usage"/>
+<a name="usage"></a>
 ## __Usage__
 
-<a name="bmp388_dev_library"/>
+<a name="bmp388_dev_library"></a>
 ### __BMP388_DEV Library__
 
 Simply include the BMP388_DEV.h file at the beginning of your sketch:
