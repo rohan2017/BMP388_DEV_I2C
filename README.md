@@ -292,7 +292,7 @@ For more details see code examples provided in the _.../examples/..._ directory.
 
 The BMP388 barometer has an interrupt (INT) output pin that enables measurements to be interrupt driven instead of using polling. Interrupts function in both in NORMAL and FORCED modes of operation.
 
-Interrupts are configured by calling the enable interrupt function with or without arguments. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. In UNLATCHED mode the interrupt signal automatically clears after 2.5ms, while in LATCHED mode the interrupt signal remains active until the data is read.
+Interrupts are configured by calling the enable interrupt function with or without arguments. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_COLLECTOR, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. In UNLATCHED mode the interrupt signal automatically clears after 2.5ms, while in LATCHED mode the interrupt signal remains active until the data is read.
 
 The default settings are PUSH_PULL, ACTIVE_HIGH and UNLATCHED:
 
@@ -313,7 +313,7 @@ bmp388.disableInterrupt();		// Enable interrupts with default settings
 The interrupt settings can also be changed independently:
 
 ```
-bmp388.setIntOutputDrive(OPEN_DRAIN);		// Set the interrupt pin's output drive to open drain
+bmp388.setIntOutputDrive(OPEN_COLLECTOR);		// Set the interrupt pin's output drive to open collector
 ```
 
 ```
@@ -597,7 +597,7 @@ bmp388.enableFIFOInterrupt();		// Disable FIFO interrupts
 It is also possible to change the FIFO interrupt settings independently using the standard interrupt settings, for example:
 
 ```
-bmp388.setOutputDrive(OPEN_DRAIN);		// Set the interrupt pin output drive to open drain
+bmp388.setOutputDrive(OPEN_COLLECTOR);		// Set the interrupt pin output drive to open collector
 ```
 
 Attaching the Arduino microcontroller to the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function, as described in the Interrupts section above.
