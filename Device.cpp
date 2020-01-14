@@ -52,6 +52,7 @@ void Device::setClock(uint32_t clockSpeed)													// Set the I2C or SPI clo
 	}
 }
 
+#ifndef ARDUINO_ARCH_ESP32
 void Device::usingInterrupt(uint8_t pinNumber)											// Wrapper for the SPI usingInterrupt() function
 {
 	spi->usingInterrupt(pinNumber);
@@ -61,6 +62,7 @@ void Device::notUsingInterrupt(uint8_t pinNumber)										// Wrapper for the SP
 {
 	spi->notUsingInterrupt(pinNumber);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Device I2C & SPI Wrapper (Protected) Member Functions
@@ -151,7 +153,7 @@ void Device::readBytes(uint8_t subAddress, uint8_t* data, uint16_t count)
 		Wire.write(subAddress);                   
 		Wire.endTransmission(false);              
 		uint8_t i = 0;
-		Wire.requestFrom(address, count);  
+		Wire.requestFrom(address, (uint8_t)count);  
 		while (Wire.available()) 
 		{
 			data[i++] = Wire.read();          
