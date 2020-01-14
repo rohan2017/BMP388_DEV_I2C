@@ -24,10 +24,10 @@ This BMP388_DEV library offers the following features:
 2. [Arduino Compatiblility](#arduino_compatibility)
 3. [Installation](#installation)
 3. [Usage](#usage)
-		 1. [BMP388_DEV Library](#bmp388_dev_library)
-		 2. [Device Initialisation](#device_intialisation)
-		 3. [Device Configuration](#device_configuration)
-		 4. [Modes Of Operation](#modes_of_operation)
+	1. [BMP388_DEV Library](#bmp388_dev_library)
+	2. [Device Initialisation](#device_intialisation)
+	3. [Device Configuration](#device_configuration)
+	4. [Modes Of Operation](#modes_of_operation)
 	
 <a name="version"></a>
 ## __Version__
