@@ -18,6 +18,7 @@ This BMP388_DEV library offers the following features:
 - Polling or interrupt driven measurements (using the BMP388's external INT pin)
 - Storage and burst reading of up to 72 temperature and pressure measurements using the BMP388's internal 512 byte FIFO memory
 
+---
 ## __Contents__
 
 1. [Version](#version)
@@ -30,21 +31,25 @@ This BMP388_DEV library offers the following features:
 	4. [Modes Of Operation](#modes_of_operation)
 	5. [Results Acquisition](#results_acquisition)
 	6. [Code Implementation](#code_implementation)
-	7. [Interrupts](#interrupts)
-	8. [FIFO (First In First Out) Operation](#fifo_operation)
-	9. [FIFO Operation With Interrupts](#fifo_operation_with_interrupts)
-4. [Example Code](#example_code)
+4. [Additional Features](#additional_features)
+	1. [Interrupts](#interrupts)
+	2. [FIFO (First In First Out) Operation](#fifo_operation)
+	3. [FIFO Operation With Interrupts](#fifo_operation_with_interrupts)
+5. [Example Code](#example_code)
 	
+---
 <a name="version"></a>
 ## __Version__
 
 - Version 1.0.0 -- Intial version
 
+---
 <a name="arduino_compatibility"></a>
 ## __Arduino Compatibility__
 
 - All Arduino boards, but for 5V Arduino boards (such as the Uno, Nano, Mega, Leonardo, etc...), please check if the BMP388 breakout board requires a 5V to +3.3V voltage level shifter
 
+---
 <a name="installation"></a>
 ## __Installation__
 
@@ -52,6 +57,7 @@ The BMP388_DEV library can be installed using the Arduino IDE's Library Manager.
 
 Alternatively simply download BMP388_DEV from this Github repository, un-zip or extract the files and place the BMP388_DEV directory in your _.../Arduino/libraries/..._ folder. The _.../Arduino/..._ folder is the one where your Arduino IDE sketches are usually located.
 
+---
 <a name="usage"></a>
 ## __Usage__
 
@@ -282,6 +288,9 @@ BMP388_DEV bmp388(10);	// Instantiate (create) a BMP388_DEV object and set-up fo
 For more details see code examples provided in the _.../examples/..._ directory.
 
 ---
+<a name="additional_features"></a>
+## __Additional Features__
+
 <a name="interrupts"></a>
 ### __Interrupts__
 
