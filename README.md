@@ -28,6 +28,12 @@ This BMP388_DEV library offers the following features:
 	2. [Device Initialisation](#device_intialisation)
 	3. [Device Configuration](#device_configuration)
 	4. [Modes Of Operation](#modes_of_operation)
+	5. [Results Acquisition](#results_acquisition)
+	6. [Code Implementation](#code_implementation)
+	7. [Interrupts](#interrupts)
+	8. [FIFO (First In First Out) Operation](#fifo_operation)
+	9. [FIFO Operation With Interrupts](#fifo_operation_with_interrupts)
+4. [Example Code](#example_code)
 	
 <a name="version"></a>
 ## __Version__
@@ -199,6 +205,7 @@ bmp388.getPressure(pressure);	// Acquire the pressure only, (also calculates tem
 bmp388.getAltitude(altitude);	// Acquire the altitude only
 ```
 ---
+<a name="code_implementation"></a>
 ### __Code Implementation__
 
 Here is an example sketch of how to use the BMP388 library for non-blocking I2C operation, default configuration with continuous conversion in NORMAL_MODE, but with a standby sampling time of 1 second:
@@ -275,6 +282,7 @@ BMP388_DEV bmp388(10);	// Instantiate (create) a BMP388_DEV object and set-up fo
 For more details see code examples provided in the _.../examples/..._ directory.
 
 ---
+<a name="interrupts"></a>
 ### __Interrupts__
 
 The BMP388 barometer has an INT output pin that enables measurements to be interrupt driven instead of using polling. Interrupts function in both in NORMAL and FORCED modes of operation.
@@ -419,6 +427,7 @@ void interruptHandler()                             // Interrupt handler functio
 ```
 
 ---
+<a name="fifo_operation"></a>
 ## __FIFO (First In First Out) Operation__ 
 
 The BMP388 barometer contains a 512 byte FIFO memory, capable of storing and burst reading up to 72 temperature and pressure measurements in NORMAL_MODE.
@@ -564,6 +573,7 @@ void loop()
 ```
 
 ---
+<a name="fifo_operation_with_interrupts"></a>
 ## __FIFO Operation with Interrupts__ 
 
 In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to independently collect data over a long duration, while the microcontroller remains asleep.
@@ -664,6 +674,7 @@ void interruptHandler()                               // Interrupt service routi
 ```
 
 ---
+<a name="example_code"></a>
 ## __Example Code__
 
 Here is the list of the Arduino example sketches:
