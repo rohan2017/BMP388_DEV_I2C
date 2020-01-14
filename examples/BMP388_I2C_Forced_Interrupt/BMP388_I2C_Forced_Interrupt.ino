@@ -31,7 +31,6 @@ void loop()
     Serial.println(F("m")); 
     dataReady = false;                            // Clear the dataReady flag
   }   
-  delay(1000);                                    // Wait for 1 second
 }
 
 void interruptHandler()                           // Interrupt handler function
