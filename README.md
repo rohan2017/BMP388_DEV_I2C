@@ -24,7 +24,10 @@ This BMP388_DEV library offers the following features:
 2. [Arduino Compatiblility](#arduino_compatibility)
 3. [Installation](#installation)
 3. [Usage](#usage)
-		 4. [BMP388_DEV Library](#bmp388_dev_library)
+		 1. [BMP388_DEV Library](#bmp388_dev_library)
+		 2. [Device Initialisation](#device_intialisation)
+		 3. [Device Configuration](#device_configuration)
+		 4. [Modes Of Operation](#modes_of_operation)
 	
 <a name="version"></a>
 ## __Version__
@@ -83,6 +86,7 @@ bmp388.setClock(4000000);			// Set the SPI clock to 4MHz
 ```
 
 ---
+<a name="device_initialisation"></a>
 ### __Device Initialisation__
 
 To initialise the BMP388 it is necessary to call the begin() function with or without arguments. The parameters specify the starting mode, pressure/temperature oversampling, IIR filter and standby time options respectively:
@@ -118,6 +122,7 @@ bmp388.begin(BMP388_I2C_ALT_ADDR);	// Initialise the BMP388 with the alternate I
 Note that the begin functions return the value 1 upon successful initialisation, otherwise it returns 0 for failure.
 
 ---
+<a name="device_configuration"></a>
 ### __Device Configuration__
 
 After initialisation it is possible to change the BMP388 configuration with the following functions:
@@ -138,6 +143,7 @@ bmp388.setIIRFilter(IIR_FILTER_16);	// Options are IIR_FILTER_OFF, _2, _4, _8, _
 bmp388.setTimeStandby(TIME_STANDBY_2000MS);	// Options are TIME_STANDBY_05MS, _62MS, _125MS, _250MS, _500MS, _1000MS, 2000MS, 4000MS
 ```
 ---
+<a name="modes_of_operation"></a>
 ### __Modes Of Operation__
 
 The BMP388 has 3 modes of operation: **SLEEP_MODE**, **NORMAL_MODE** and **FORCED_MODE**: 
@@ -166,6 +172,7 @@ To stop the conversion at anytime and return to **SLEEP_MODE**:
 bmp388.stopConversion();	// Stop conversion and return to SLEEP_MODE
 ```
 ---
+<a name="results_acquisition"></a>
 ### __Results Acquisition__
 
 The BMP388 barometer library acquires temperature in degrees celius (**°C**), pressure in hectoPascals/millibar (**hPa**) and altitude in metres (**m**). The acquisition functions scan the BMP388's status register and return 1 if the barometer results are ready and have been successfully read, 0 if they are not; this allows for non-blocking code implementation. The temperature, pressure and altitude results themselves are _float_ variables by passed reference to the function and are updated upon a successful read.
