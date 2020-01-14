@@ -66,7 +66,7 @@ Simply include the BMP388_DEV.h file at the beginning of your sketch:
 #include <BMP388_DEV.h>
 ```
 
-For I2C communication the BMP388_DEV object is created (instantiated) without parameters:
+For I2C communication the BMP388_DEV object is created (instantiated) without any parameters:
 
 ```
 BMP388_DEV bmp388;	// Set up I2C communications
@@ -127,7 +127,7 @@ Or even just the alternate I2C address, (BMP388 initialised in SLEEP_MODE by def
 bmp388.begin(BMP388_I2C_ALT_ADDR);	// Initialise the BMP388 with the alternate I2C address (0x76)
 ```
 
-Note that the begin functions return the value 1 upon successful initialisation, otherwise it returns 0 for failure.
+Note that the begin() functions return the value 1 upon successful initialisation, otherwise it returns 0 for failure.
 
 ---
 <a name="device_configuration"></a>
@@ -290,7 +290,7 @@ For more details see code examples provided in the _.../examples/..._ directory.
 <a name="interrupts"></a>
 ### __Interrupts__
 
-The BMP388 barometer has an INT output pin that enables measurements to be interrupt driven instead of using polling. Interrupts function in both in NORMAL and FORCED modes of operation.
+The BMP388 barometer has an interrupt (INT) output pin that enables measurements to be interrupt driven instead of using polling. Interrupts function in both in NORMAL and FORCED modes of operation.
 
 Interrupts are configured by calling the enable interrupt function with or without arguments. The parameters specify whether the INT pin output drive is: PUSH_PULL or OPEN_DRAIN, the signal is: ACTIVE_LOW or ACTIVE_HIGH and interrupt itself is: UNLATCHED or LATCHED. In UNLATCHED mode the interrupt signal automatically clears after 2.5ms, while in LATCHED mode the interrupt signal remains active until the data is read.
 
@@ -437,13 +437,15 @@ void interruptHandler()                             // Interrupt handler functio
 
 The BMP388 barometer contains a 512 byte FIFO memory, capable of storing and burst reading up to 72 temperature and pressure measurements in NORMAL_MODE.
 
-By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time. Sensor time is the internal timing of the BMP388 barometer, the datasheet however does not specify the time's units. Additional p
+By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time. Sensor time is the internal timing of the BMP388 barometer, the datasheet however does not specify the time's units. Additional parameters include the FIFO sub-sampling time, data select and stop on FIFO full.
 
-Subsampling divides down the FIFO sampling rate down further with the settings from OFF, DIV2, DIV4,...DIV128. This allows FIFO measurements to be taken over an extended period.
+Sub-sampling divides down the FIFO sampling rate down further with the settings from OFF, DIV2, DIV4,...DIV128. This allows FIFO measurements to be taken over an extended period. For instance, if the barometer sampling rate is set to TIME_STANDBY_655360MS or 655.36 seconds, and the FIFO sub-sampling rate to SUBSAMPLING_DIV128 or divided down by 128, this gives a FIFO sampling time every 23 hours, 18 minutes. Over 72 samples the FIFO would return data almost every 70 days.
 
 Data select determines whether the data placed in the FIFO is unfiltered or filtered by the IIR filter.
 
-The parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
+Stop on FIFO full does just that: stops the FIFO from receiving data when it is full, otherwise the FIFO will continue to allow new data to overwrite old.
+
+The enableFIFO() function parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
 
 ```
 bmp388.enableFIFO(PRES_ENABLED, ALT_ENABLED, TIME_ENABLED, SUBSAMPLETIME_OFF, FILTERED);	// Enable FIFO with default argurments
@@ -484,10 +486,10 @@ bmp388.SetDataSelect(FILTERED);		// Set FIFO to store unfiltered or filtered dat
 ```
 
 ```
-bmp388.StopFIFOOnFull(STOP_ON_FULL_ENABLED);	// Set FIFO to stop when full, options: UNFILTERED, FILTERED
+bmp388.StopFIFOOnFull(STOP_ON_FULL_ENABLED);	// Set FIFO to stop when full, options: STOP_ON_FULL_DISABLED, STOP_ON_FULL_ENABLED
 ```
 
-To specify the number of measurements required:
+The setFIFONoOfMeasurements() function calculates the FIFO size in bytes required to store the specified number of either temperature, or temperature and pressure meaurements. The function returns 1 if the number of measurements fits within the BMP388's FIFO, 0 if the required number of measurements is too large:
 
 ```
 bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS);		// Calculate the size of the FIFO required to store the measurements
@@ -495,15 +497,13 @@ bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS);		// Calculate the size of th
 
 The maximum number of measurements is 72 for temperature and pressure and 126 for temperature alone.
 
-This function above calculates the FIFO size in bytes required to store the specified number of either temperature or temperature and pressure meaurements. The function returns 1 the number of measurements fits within the BMP388's FIFO, 0 if the required number of measurements is too large.
-
-To check if the FIFO measurements are ready the getFIFOData() function can be polled. The function returns 1 if the measurements are ready, 0 if they are still pending. The parameters include float pointers to temperature, pressure and altitude arrays, as well the sensorTime append to each batch of measurements that is a uint32_t (unsigned long) variable passed by reference:
+To check if the FIFO measurements are ready the getFIFOData() function can be polled. The function returns 1 if the measurements are ready, 0 if they are still pending. The parameters include _float_ pointers to temperature, pressure and altitude arrays, as well the sensorTime append to each batch of measurements that is a _uint32_t_ (_unsigned long_) variable passed by reference:
 
 ```
 bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime);
 ```
 
-The float arrays are decleared whose size (number of indices) matches the number of measurements:
+The float arrays are decleared, whose size (number of indices) matches the number of measurements:
 
 ```
 float temperature[NO_OF_MEASUREMENTS];              // Create the temperature, pressure and altitude array variables
@@ -512,19 +512,14 @@ float altitude[NO_OF_MEASUREMENTS];
 uint32_t sensorTime;                                // Sensor time
 ```
 
-A pointer to the head of each temperature, pressure and altitude array, as well as the sensor time is passed to the function:
-
+A pointer to the head of each temperature, pressure and altitude array, as well as the sensor time is passed to the function, each time the FIFO is polled for data:
 
 ```
-if (bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime)
+if (bmp388.getFifoData(float temperature, float pressure, float altitude, float sensorTime)
 {
 	// The FIFO measurements are ready
 }
 ```
-
-The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample.
-
-The data select option allows the FIFO to store data that UNFILTERED or FILTERED
 
 Here is an example sketch using SPI in NORMAL_MODE, default configuration with FIFO operation:
 
@@ -581,7 +576,7 @@ void loop()
 <a name="fifo_operation_with_interrupts"></a>
 ### __FIFO Operation with Interrupts__ 
 
-In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to independently collect data over a long duration, while the microcontroller remains asleep.
+In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller when a batch of measurements are ready. This is extremely useful for ultra low power applications, since it allows the barometer to independently collect data over a long duration, while the microcontroller remains asleep.
 
 To enable FIFO interrupts simply call the FIFO interrupt function, the parameters are identical to the standard enable interrupt function:
 
