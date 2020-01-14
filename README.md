@@ -324,7 +324,7 @@ bmp388.setIntActiveLevel(ACTIVE_LOW);		// Set the interrupt signal's active leve
 bmp388.setIntLatchConfig(LATCHED);		// Set the interrupt signal to latch until cleared
 ```
 
-Attaching the Arduino microcontroller the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function:
+Attaching the Arduino microcontroller to the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function:
 
 ```
 attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
@@ -601,6 +601,8 @@ It is also possible to change the FIFO interrupt settings independently using th
 ```
 bmp388.setOutputDrive(OPEN_DRAIN);		// Set the interrupt pin output drive to open drain
 ```
+
+Attaching the Arduino microcontroller to the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function, as described in the Interrupts section above.
 
 When using the SPI interface with the getFIFOData() function called from within the interrupt service routine, it is necessary to declare the measurement arrays and sensor time variable as _volatile_:
 
