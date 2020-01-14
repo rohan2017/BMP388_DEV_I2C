@@ -37,19 +37,16 @@ This BMP388_DEV library offers the following features:
 	3. [FIFO Operation With Interrupts](#fifo_operation_with_interrupts)
 5. [Example Code](#example_code)
 	
----
 <a name="version"></a>
 ## __Version__
 
 - Version 1.0.0 -- Intial version
 
----
 <a name="arduino_compatibility"></a>
 ## __Arduino Compatibility__
 
 - All Arduino boards, but for 5V Arduino boards (such as the Uno, Nano, Mega, Leonardo, etc...), please check if the BMP388 breakout board requires a 5V to +3.3V voltage level shifter
 
----
 <a name="installation"></a>
 ## __Installation__
 
@@ -57,7 +54,6 @@ The BMP388_DEV library can be installed using the Arduino IDE's Library Manager.
 
 Alternatively simply download BMP388_DEV from this Github repository, un-zip or extract the files and place the BMP388_DEV directory in your _.../Arduino/libraries/..._ folder. The _.../Arduino/..._ folder is the one where your Arduino IDE sketches are usually located.
 
----
 <a name="usage"></a>
 ## __Usage__
 
@@ -437,7 +433,7 @@ void interruptHandler()                             // Interrupt handler functio
 
 ---
 <a name="fifo_operation"></a>
-## __FIFO (First In First Out) Operation__ 
+### __FIFO (First In First Out) Operation__ 
 
 The BMP388 barometer contains a 512 byte FIFO memory, capable of storing and burst reading up to 72 temperature and pressure measurements in NORMAL_MODE.
 
@@ -583,7 +579,7 @@ void loop()
 
 ---
 <a name="fifo_operation_with_interrupts"></a>
-## __FIFO Operation with Interrupts__ 
+### __FIFO Operation with Interrupts__ 
 
 In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to independently collect data over a long duration, while the microcontroller remains asleep.
 
