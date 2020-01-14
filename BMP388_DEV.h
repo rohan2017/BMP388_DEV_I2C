@@ -134,7 +134,7 @@ enum TimeStandby {
 
 enum OutputDrive {												// Interrupt output drive configuration
 	PUSH_PULL 						 = 0x00,
-	OPEN_DRAIN						 = 0x01
+	OPEN_COLLECTOR				 = 0x01
 };
 
 enum ActiveLevel {												// Interrupt output active level configuration
