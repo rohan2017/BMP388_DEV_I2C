@@ -202,7 +202,7 @@ void BMP388_DEV::disableInterrupt()																	// Disable the data ready in
 	writeByte(BMP388_INT_CTRL, int_ctrl.reg);
 }
 
-void BMP388_DEV::setIntOutputDrive(OutputDrive outputDrive)					// Set the interrupt output drive: PUSH_PULL or OPEN_DRAIN
+void BMP388_DEV::setIntOutputDrive(OutputDrive outputDrive)					// Set the interrupt output drive: PUSH_PULL or OPEN_COLLECTOR
 {
 	int_ctrl.bit.int_od = outputDrive;
 	writeByte(BMP388_INT_CTRL, int_ctrl.reg);
