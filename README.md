@@ -330,7 +330,7 @@ Attaching the Arduino microcontroller to the BMP388's INT pin is performed using
 attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
 ```
 
-If the SPI interface is being used and happens to be shared with other devices, then it is also necessary to call the SPI usingInterrupt function as well:
+If the SPI interface is being used and happens to be shared with other devices, then it is also necessary to call the SPI usingInterrupt function as well, (with the exception of the ESP32):
 
 ```
 bmp388.usingInterrupt(digitalPinToInterrupt(2));     // Invoke the SPI usingInterrupt() function
