@@ -13,7 +13,7 @@ void setup()
 {
   Serial.begin(115200);                           // Initialise the serial port
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE 
-  bmp388.setTimeStandby(TIME_STANDBY_1000MS);     // Set the standby time to 1 second (1000ms)
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
   bmp388.startNormalConversion();                 // Start NORMAL continuous conversion
   
   xTaskCreatePinnedToCore(                        // Kick-off "TaskOne" pinned to core 1
