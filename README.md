@@ -67,7 +67,7 @@ SPIClass SPI1(HSPI);							    // Create the SPI1 HSPI object
 BMP388_DEV bmp388(21, HSPI, SPI1);		// Set up HSPI port communications on the ESP32
 ```
 
-By default the I2C runs in fast mode at 400kHz and SPI at 1MHz. However it is possible to change the clock speed using the set clock function:
+By default the I2C runs in fast mode at 400kHz and SPI at 1MHz. However it is possible to change either the I2C or SPI clock speed using the set clock function:
 
 ```
 bmp388.setClock(4000000);			// Set the SPI clock to 4MHz
@@ -401,6 +401,7 @@ void interruptHandler()                             // Interrupt handler functio
   dataReady = true;                                 // Set the data ready flag
 }
 ```
+
 ---
 ## __FIFO (First In First Out) Operation__ 
 
@@ -408,7 +409,9 @@ The BMP388 barometer contains a 512 byte FIFO memory, capable of storing and bur
 
 By default the BMP388_DEV library always enables temperature, pressure, altitude and sensor time. Sensor time is the internal timing of the BMP388 barometer, the datasheet however does not specify the time's units. Additional p
 
-Subsampling divides down the FIFO sampling rate down further with the settings from OFF, DIV2, DIV4,...DIV128. Data select determines whether the data placed in the FIFO is unfiltered or filtered by the IIR filter.
+Subsampling divides down the FIFO sampling rate down further with the settings from OFF, DIV2, DIV4,...DIV128. This allows FIFO measurements to be taken over an extended period.
+
+Data select determines whether the data placed in the FIFO is unfiltered or filtered by the IIR filter.
 
 The parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
 
@@ -459,17 +462,17 @@ To specify the number of measurements required:
 ```
 bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS);		// Calculate the size of the FIFO required to store the measurements
 ```
-The maximum number of measurements for temperature and pressure is 72 and for temperature alone is 126.
 
-This function above calculates the FIFO size in bytes required to store the specified number of either temperature or temperature and pressure meaurements. If the memory allocation + sensortime (4 bytes) + overhead (2 bytes) exceeds the size of the FIFO it returns 0 or failure, oth
+The maximum number of measurements is 72 for temperature and pressure and 126 for temperature alone.
+
+This function above calculates the FIFO size in bytes required to store the specified number of either temperature or temperature and pressure meaurements. The function returns 1 the number of measurements fits within the BMP388's FIFO, 0 if the required number of measurements is too large.
 
 To check if the FIFO measurements are ready the getFIFOData() function can be polled. The function returns 1 if the measurements are ready, 0 if they are still pending. The parameters include float pointers to temperature, pressure and altitude arrays, as well the sensorTime append to each batch of measurements that is a uint32_t (unsigned long) variable passed by reference:
+
 ```
-if (bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime)
-{
-	// The FIFO measurements are ready
-}
+bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime);
 ```
+
 The float arrays are decleared whose size (number of indices) matches the number of measurements:
 
 ```
@@ -479,25 +482,86 @@ float altitude[NO_OF_MEASUREMENTS];
 uint32_t sensorTime;                                // Sensor time
 ```
 
+A pointer to the head of each temperature, pressure and altitude array, as well as the sensor time is passed to the function:
+
+
+```
+if (bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime)
+{
+	// The FIFO measurements are ready
+}
+```
+
 The FIFO also allows measurements to the FIFO to be sub-sampled at a lower rate than the sample rate. The sub-sample rate is a division of the barometer standard sample rate and can be set using the subSample.
 
 The data select option allows the FIFO to store data that UNFILTERED or FILTERED
 
+Here is an example sketch using SPI in NORMAL_MODE, default configuration with FIFO operation:
+
+```
+/////////////////////////////////////////////////////////////////////////////////////
+// BMP388_DEV - SPI Communications, Default Configuration, Normal Conversion, FIFO 
+/////////////////////////////////////////////////////////////////////////////////////
+
+#include <BMP388_DEV.h>                             // Include the BMP388_DEV.h library
+
+#define NO_OF_MEASUREMENTS   10                     // Number of measurements to be stored in the FIFO before reading
+
+float temperature[NO_OF_MEASUREMENTS];              // Create the temperature, pressure and altitude array variables
+float pressure[NO_OF_MEASUREMENTS];
+float altitude[NO_OF_MEASUREMENTS];
+uint32_t sensorTime;                                // Sensor time
+BMP388_DEV bmp388(10);                              // Instantiate (create) a BMP388_DEV object and set-up for SPI operation on digital pin D10
+
+void setup() 
+{
+  Serial.begin(115200);                             // Initialise the serial port
+  bmp388.begin();                                   // Default initialisation, place the BMP388 into SLEEP_MODE 
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);       // Set the standby time to 1.3 seconds * 10 = measurement every 13 seconds
+  bmp388.enableFIFO();                              // Enable the BMP388's FIFO
+  bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS);   // Store 10 measurements in the FIFO before reading
+  bmp388.startNormalConversion();                   // Start BMP388 continuous conversion in NORMAL_MODE 
+  Serial.println(F("Please wait for 13 seconds...")); // Wait message
+}
+
+void loop() 
+{
+  if (bmp388.getFIFOData(temperature, pressure, altitude, sensorTime))    // If the FIFO data is ready: get the 10 measurement readings
+  {
+    for (uint16_t i = 0; i < NO_OF_MEASUREMENTS; i++)     // Display the results 
+    {
+      Serial.print(i + 1);                            
+      Serial.print(F(" : "));
+      Serial.print(temperature[i]);                         
+      Serial.print(F("*C   "));
+      Serial.print(pressure[i]);    
+      Serial.print(F("hPa   "));
+      Serial.print(altitude[i]);
+      Serial.println(F("m"));  
+    }
+    Serial.print(F("Sensor Time: "));
+    Serial.println(sensorTime);
+    Serial.println();
+    Serial.println(F("Please wait for 13 seconds..."));   // Wait message
+  }
+}
+```
 
 ---
 ## __FIFO Operation with Interrupts__ 
 
 In NORMAL_MODE the BMP388 barometer also allows FIFO operation to be integrated with interrupts, using its INT pin to indicate to the microcontroller that batch of measurements are ready to be read. This is extremely useful for ultra low power applications, since it allows the barometer to independently collect data over a long duration, while the microcontroller remains asleep.
 
-To enable FIFO interrupts simply call the FIFO interrupt function, the parameters are identical to the enable interrupt function with the same default argurments:
+To enable FIFO interrupts simply call the FIFO interrupt function, the parameters are identical to the standard enable interrupt function:
 
 ```
 bmp388.enableFIFOInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable FIFO interrupts
 ```
-Alternatively, this function can also be called with default arguments without specifying any parameters:
+
+Alternatively, this function can also be called with default arguments:
 
 ```
-bmp388.enableFIFOInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);		// Enable FIFO interrupts
+bmp388.enableFIFOInterrupt();		// Enable FIFO interrupts
 ```
 
 To disable FIFO interrupts:
@@ -506,26 +570,81 @@ To disable FIFO interrupts:
 bmp388.enableFIFOInterrupt();		// Disable FIFO interrupts
 ```
 
-It is also possible to change the FIFO interrupt settings independently:
+It is also possible to change the FIFO interrupt settings independently using the standard interrupt settings, for example:
 
 ```
-
+bmp388.setOutputDrive(OPEN_DRAIN);		// Set the interrupt pin output drive to open drain
 ```
 
-```
+When using the SPI interface with the getFIFOData() function called from within the interrupt service routine, it is necessary to declare the measurement arrays and sensor time variable as _volatile_:
 
 ```
-
+volatile float temperature[NO_OF_MEASUREMENTS];		// Create the temperature, pressure and altitude array variables
+volatile float pressure[NO_OF_MEASUREMENTS];
+volatile float altitude[NO_OF_MEASUREMENTS];
+volatile uint32_t sensorTime;                  		// Sensor time
 ```
 
-```
-As  float arrays are decleared whose size (number of indices) matches the number of measurements:
+Here is an example sketch using SPI in NORMAL_MODE, default configuration with FIFO operation and interrupts:
 
 ```
-float temperature[NO_OF_MEASUREMENTS];              // Create the temperature, pressure and altitude array variables
-float pressure[NO_OF_MEASUREMENTS];
-float altitude[NO_OF_MEASUREMENTS];
-uint32_t sensorTime;                                // Sensor time
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// BMP388_DEV - SPI Communications, Default Configuration, Normal Conversion, Interrupts, FIFO
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <BMP388_DEV.h>                               // Include the BMP388_DEV.h library
+
+#define NO_OF_MEASUREMENTS   10                       // Number of measurements to be stored in the FIFO before reading
+
+volatile float temperature[NO_OF_MEASUREMENTS];       // Create the temperature, pressure and altitude array variables
+volatile float pressure[NO_OF_MEASUREMENTS];
+volatile float altitude[NO_OF_MEASUREMENTS];
+volatile uint32_t sensorTime;                         // Sensor time
+volatile boolean fifoDataReady = false;                
+BMP388_DEV bmp388(10);                                // Instantiate (create) a BMP388_DEV object and set-up for SPI operation on digital pin D10
+
+void setup() 
+{
+  Serial.begin(115200);                               // Initialise the serial port
+  bmp388.begin();                                     // Default initialisation, place the BMP388 into SLEEP_MODE 
+  bmp388.enableFIFOInterrupt();                       // Enable the BMP388's FIFO interrupts on the INT pin
+  SPI.usingInterrupt(digitalPinToInterrupt(2));       // Invoke the SPI usingInterrupt() function
+  attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);         // Set the standby time to 1.3 seconds * 10 = measurement every 13 seconds
+  bmp388.enableFIFO();                                // Enable the BMP388's FIFO
+  bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS); // Store 10 measurements in the FIFO before reading
+  bmp388.startNormalConversion();                     // Start BMP388 continuous conversion in NORMAL_MODE 
+  Serial.println(F("Please wait for 13 seconds...")); // Wait message
+}
+
+void loop() 
+{
+  if (fifoDataReady)                                  // If the FIFO data is ready: get the 10 measurement readings
+  {
+    fifoDataReady = false;                            // Clear the FIFO data ready flag
+    for (uint16_t i = 0; i < NO_OF_MEASUREMENTS; i++) // Display the results 
+    {
+      Serial.print(i + 1);                            
+      Serial.print(F(" : "));
+      Serial.print(temperature[i]);                         
+      Serial.print(F("*C   "));
+      Serial.print(pressure[i]);    
+      Serial.print(F("hPa   "));
+      Serial.print(altitude[i]);
+      Serial.println(F("m"));  
+    }
+    Serial.print(F("Sensor Time: "));
+    Serial.println(sensorTime);
+    Serial.println();
+    Serial.println(F("Please wait for 13 seconds...")); // Wait message  
+  }
+}
+
+void interruptHandler()                               // Interrupt service routine (ISR)
+{  
+  bmp388.getFIFOData(temperature, pressure, altitude, sensorTime);   // Get the FIFO data
+  fifoDataReady = true;                               // Set the FIFO data ready flag  
+}
 ```
 
 ---
