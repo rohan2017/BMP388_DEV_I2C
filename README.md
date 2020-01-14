@@ -127,7 +127,7 @@ Or even just the alternate I2C address, (BMP388 initialised in SLEEP_MODE by def
 bmp388.begin(BMP388_I2C_ALT_ADDR);	// Initialise the BMP388 with the alternate I2C address (0x76)
 ```
 
-Note that the begin() functions return the value 1 upon successful initialisation, otherwise it returns 0 for failure.
+Note that the _begin()_ functions return the value 1 upon successful initialisation, otherwise it returns 0 for failure.
 
 ---
 <a name="device_configuration"></a>
@@ -443,12 +443,12 @@ Sub-sampling divides down the FIFO sampling rate down further with the settings 
 
 Data select determines whether the data placed in the FIFO is unfiltered or filtered by the IIR filter.
 
-Stop on FIFO full does just that: stops the FIFO from receiving data when it is full, otherwise the FIFO will continue to allow new data to overwrite old.
+Stop on FIFO full, stops the FIFO from receiving data when it is full, otherwise the FIFO will continue to allow new data to overwrite old.
 
-The enableFIFO() function parameters include pressure enable, altitude enable, sensor time enable, subsampling rate and data select: 
+The enableFIFO() function parameters include pressure enable, altitude enable, sensor time enable, subsampling rate, data select and stop FIFO on full: 
 
 ```
-bmp388.enableFIFO(PRES_ENABLED, ALT_ENABLED, TIME_ENABLED, SUBSAMPLETIME_OFF, FILTERED);	// Enable FIFO with default argurments
+bmp388.enableFIFO(PRES_ENABLED, ALT_ENABLED, TIME_ENABLED, SUBSAMPLETIME_OFF, FILTERED, STOP_FIFO_ON_FULL);	// Enable FIFO with default argurments
 ```
 
 Alternatively, to enable the FIFO with default settings and without arguments: 
@@ -489,21 +489,19 @@ bmp388.SetDataSelect(FILTERED);		// Set FIFO to store unfiltered or filtered dat
 bmp388.StopFIFOOnFull(STOP_ON_FULL_ENABLED);	// Set FIFO to stop when full, options: STOP_ON_FULL_DISABLED, STOP_ON_FULL_ENABLED
 ```
 
-The setFIFONoOfMeasurements() function calculates the FIFO size in bytes required to store the specified number of either temperature, or temperature and pressure meaurements. The function returns 1 if the number of measurements fits within the BMP388's FIFO, 0 if the required number of measurements is too large:
+The _setFIFONoOfMeasurements()_ function calculates the FIFO size in bytes required to store the specified number of either temperature and pressure or temperature meaurements. The function returns 1 if successful, 0 for failure, The maximum number of measurements is 72 for temperature and pressure and 126 for temperature alone:
 
 ```
 bmp388.setFIFONoOfMeasurements(NO_OF_MEASUREMENTS);		// Calculate the size of the FIFO required to store the measurements
 ```
 
-The maximum number of measurements is 72 for temperature and pressure and 126 for temperature alone.
-
-To check if the FIFO measurements are ready the getFIFOData() function can be polled. The function returns 1 if the measurements are ready, 0 if they are still pending. The parameters include _float_ pointers to temperature, pressure and altitude arrays, as well the sensorTime append to each batch of measurements that is a _uint32_t_ (_unsigned long_) variable passed by reference:
+To check if the FIFO measurements are ready the _getFIFOData()_ function can be polled. The function returns 1 if the measurements are ready, 0 if they are still pending. The parameters include _float_ pointers to temperature, pressure and altitude arrays, as well the sensorTime append to each batch of measurements that is a _uint32_t_ (_unsigned long_) variable passed by reference:
 
 ```
 bmp388.getFifoData(float *temperature, float *pressure, float *altitude, float &sensorTime);
 ```
 
-The float arrays are decleared, whose size (number of indices) matches the number of measurements:
+The _float_ arrays are decleared, whose size (number of indices) matches the number of measurements:
 
 ```
 float temperature[NO_OF_MEASUREMENTS];              // Create the temperature, pressure and altitude array variables
@@ -512,7 +510,7 @@ float altitude[NO_OF_MEASUREMENTS];
 uint32_t sensorTime;                                // Sensor time
 ```
 
-A pointer to the head of each temperature, pressure and altitude array, as well as the sensor time is passed to the function, each time the FIFO is polled for data:
+A pointer to the head of each temperature, pressure and altitude array, as well as the sensor time are passed to the function, each time the FIFO is polled for data:
 
 ```
 if (bmp388.getFifoData(float temperature, float pressure, float altitude, float sensorTime)
@@ -604,7 +602,7 @@ bmp388.setOutputDrive(OPEN_DRAIN);		// Set the interrupt pin output drive to ope
 
 Attaching the Arduino microcontroller to the BMP388's INT pin is performed using the standard Arduino attachInterrupt() function, as described in the Interrupts section above.
 
-When using the SPI interface with the getFIFOData() function called from within the interrupt service routine, it is necessary to declare the measurement arrays and sensor time variable as _volatile_:
+When using the SPI interface with the _getFIFOData()_ function called from within the interrupt service routine, it is necessary to declare the measurement arrays and sensor time variable as _volatile_:
 
 ```
 volatile float temperature[NO_OF_MEASUREMENTS];		// Create the temperature, pressure and altitude array variables
