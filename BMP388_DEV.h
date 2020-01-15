@@ -296,7 +296,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 			int16_t  param_P9;
 			int8_t 	 param_P10;
 			int8_t 	 param_P11;
-		} params;
+		} __attribute__ ((packed)) params;
 		
 		struct FloatParams {																				// The BMP388 float point compensation trim parameters
 			float param_T1;
