@@ -632,7 +632,7 @@ void setup()
   Serial.begin(115200);                               // Initialise the serial port
   bmp388.begin();                                     // Default initialisation, place the BMP388 into SLEEP_MODE 
   bmp388.enableFIFOInterrupt();                       // Enable the BMP388's FIFO interrupts on the INT pin
-  SPI.usingInterrupt(digitalPinToInterrupt(2));       // Invoke the SPI usingInterrupt() function
+  bmp388.usingInterrupt(digitalPinToInterrupt(2));    // Invoke the SPI usingInterrupt() function
   attachInterrupt(digitalPinToInterrupt(2), interruptHandler, RISING);   // Set interrupt to call interruptHandler function on D2
   bmp388.setTimeStandby(TIME_STANDBY_1280MS);         // Set the standby time to 1.3 seconds * 10 = measurement every 13 seconds
   bmp388.enableFIFO();                                // Enable the BMP388's FIFO
