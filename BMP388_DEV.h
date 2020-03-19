@@ -4,6 +4,7 @@
 	Copyright (C) Martin Lindupp 2020
 	
 	V1.0.0 -- Initial release 		
+	V1.0.1 -- Fix uninitialised structures, thanks to David Jade investigating and flagging up this issue
 	
 	The MIT License (MIT)
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -201,6 +202,9 @@ enum WatchdogTimout {											// I2C watchdog time-out
 class BMP388_DEV : public Device {															// Derive the BMP388_DEV class from the Device class
 	public:
 		BMP388_DEV();																								// BMP388_DEV object for I2C operation
+#ifdef ARDUINO_ARCH_ESP8266
+		BMP388_DEV(uint8_t sda, uint8_t scl);												// BMP388_DEV object for ESP8266 I2C operation with user-defined pins
+#endif
 		BMP388_DEV(uint8_t cs);																			// BMP388_DEV object for SPI operation
 #ifdef ARDUINO_ARCH_ESP32
 		BMP388_DEV(uint8_t cs, uint8_t spiPort, SPIClass& spiClass);	// BMP388_DEV object for SPI1 with supplied SPIClass object
@@ -220,6 +224,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 		void setTempOversampling(Oversampling tempOversampling);		// Set the temperature oversampling: OFF, X1, X2, X4, X8, X16, X32
 		void setIIRFilter(IIRFilter iirFilter);											// Set the IIR filter setting: OFF, 2, 3, 8, 16, 32
 		void setTimeStandby(TimeStandby timeStandby);	 							// Set the time standby measurement interval: 5, 62, 125, 250, 500ms, 1s, 2s, 4s
+		void setSeaLevelPressure(float pressure = 1013.23f);				// Set the sea level pressure value
 		uint8_t getTemperature(volatile float &temperature);				// Get a temperature measurement
 		uint8_t getPressure(volatile float &pressure);							// Get a pressure measurement
 		uint8_t getTempPres(volatile float &temperature, 						// Get a temperature and pressure measurement
@@ -321,7 +326,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t chip_id_fixed : 4;
 			} bit;
 			uint8_t reg;
-		} chip_id;
+		} chip_id = { .reg = 0 };
 				
 		union {																											// Copy of the BMP388's error register
 			struct {
@@ -330,14 +335,14 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t ctrl_err	: 1;
 			} bit;
 			uint8_t reg;
-		} err_reg;
+		} err_reg = { .reg = 0 };
 			
 		union {																											// Copy of the BMP388's event register
 			struct {
 				uint8_t por_detected : 1;
 			} bit;
 			uint8_t reg;
-		} event;
+		} event = { .reg = 0 };
 		
 		volatile union {																						// Copy of the BMP388's interrupt status register
 			struct {
@@ -347,7 +352,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t drdy			: 1;
 			} bit;
 			uint8_t reg;
-		} int_status;
+		} int_status = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's FIFO configuration register 1
 			struct {
@@ -358,7 +363,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t fifo_temp_en			: 1;
 			} bit;
 			uint8_t reg;
-		} fifo_config_1;
+		} fifo_config_1 = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's FIFO configuration register 2
 			struct {
@@ -366,7 +371,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t data_select			 : 3;
 			} bit;
 			uint8_t reg;
-		} fifo_config_2;
+		} fifo_config_2 = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's interrupt control register
 			struct {
@@ -379,7 +384,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t drdy_en		: 1;
 			} bit;
 			uint8_t reg;
-		} int_ctrl;
+		} int_ctrl = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's interface configuration register
 			struct {
@@ -388,7 +393,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t i2c_wdt_sel : 1;
 			} bit;
 			uint8_t reg;
-		} if_conf;
+		} if_conf = { .reg = 0 };
 		
 		volatile union {																						// Copy of the BMP388's power control register
 			struct {
@@ -398,7 +403,7 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t mode		 : 2;
 			} bit;
 			uint8_t reg;
-		} pwr_ctrl;
+		} pwr_ctrl = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's oversampling register
 			struct {
@@ -406,14 +411,14 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t osr_t : 3;
 			} bit;
 			uint8_t reg;
-		} osr;
+		} osr = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's output data rate register
 			struct {
 				uint8_t odr_sel : 5;
 			} bit;
 			uint8_t reg;
-		} odr;
+		} odr = { .reg = 0 };
 		
 		union {																											// Copy of the BMP388's configuration register
 			struct {
@@ -421,13 +426,13 @@ class BMP388_DEV : public Device {															// Derive the BMP388_DEV class 
 				uint8_t iir_filter : 3;
 			} bit;
 			uint8_t reg;
-		} config;
+		} config = { .reg = 0 };
 			
 		float bmp388_compensate_temp(float uncomp_temp); 						// Bosch temperature compensation function																			
 		float bmp388_compensate_press(float uncomp_press, float t_lin); 		// Bosch pressure compensation function		
 		volatile bool alt_enable;																		// Altitude enable flag
 		const uint16_t FIFO_SIZE = 0x01FF;													// The BMP388 FIFO size 512 bytes
 		const uint8_t MAX_PACKET_SIZE = 7;													// The BMP388 maximum FIFO packet size in bytes
-		const float SEA_LEVEL_PRESSURE = 1013.23f;									// Pressure at sea level
+		float sea_level_pressure = 1013.23f;												// Pressure at sea level
 };
 #endif
