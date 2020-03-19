@@ -4,6 +4,7 @@
 	Copyright (C) Martin Lindupp 2020
 	
 	V1.0.0 -- Initial release 	
+	V1.0.1 -- Fix uninitialised structures, thanks to David Jade investigating and flagging up this issue
 	
 	The MIT License (MIT)
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +31,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 BMP388_DEV::BMP388_DEV() { setI2CAddress(BMP388_I2C_ADDR); }		// Constructor for I2C communications	
+#ifdef ARDUINO_ARCH_ESP8266
+BMP388_DEV::BMP388_DEV(uint8_t sda, uint8_t scl) : Device(sda, scl) { setI2CAddress(BMP388_I2C_ADDR); } 	// Constructor for I2C comms on ESP8266
+#endif
 BMP388_DEV::BMP388_DEV(uint8_t cs) : Device(cs) {}			   			// Constructor for SPI communications
 #ifdef ARDUINO_ARCH_ESP32 																			// Constructor for SPI communications on the ESP32
 BMP388_DEV::BMP388_DEV(uint8_t cs, uint8_t spiPort, SPIClass& spiClass) : Device(cs, spiPort, spiClass) {}
@@ -133,6 +137,11 @@ void BMP388_DEV::setTimeStandby(TimeStandby timeStandby)						// Set the time st
 	writeByte(BMP388_ODR, odr.reg);
 }
 
+void BMP388_DEV::setSeaLevelPressure(float pressure)								// Set the sea level pressure value
+{
+	sea_level_pressure = pressure;
+}
+
 uint8_t BMP388_DEV::getTemperature(volatile float &temperature)			// Get the temperature
 {
 	if (!dataReady())																									// Check if a measurement is ready
@@ -181,7 +190,7 @@ uint8_t BMP388_DEV::getMeasurements(volatile float &temperature, 		// Get all me
 {  
 	if (getTempPres(temperature, pressure))
 	{
-		altitude = ((float)powf(SEA_LEVEL_PRESSURE / pressure, 0.190223f) - 1.0f) * (temperature + 273.15f) / 0.0065f; // Calculate the altitude in metres 
+		altitude = ((float)powf(sea_level_pressure / pressure, 0.190223f) - 1.0f) * (temperature + 273.15f) / 0.0065f; // Calculate the altitude in metres 
 		return 1;
 	}
 	return 0;
@@ -337,7 +346,7 @@ FIFOStatus BMP388_DEV::getFIFOData(volatile float *temperature, volatile float *
 				pressure[measCount] /= 100.0f;
 				if (alt_enable)																							// Check if altitude measurements have been enabled
 				{
-					altitude[measCount] = ((float)powf(SEA_LEVEL_PRESSURE / pressure[measCount], 0.190223f) - 1.0f) * 	// Calculate the altitude in metres 
+					altitude[measCount] = ((float)powf(sea_level_pressure / pressure[measCount], 0.190223f) - 1.0f) * 	// Calculate the altitude in metres 
 						(temperature[measCount]  + 273.15f) / 0.0065f; 
 				}
 				count += 6;																									// Increment the byte count by the size of the data payload
