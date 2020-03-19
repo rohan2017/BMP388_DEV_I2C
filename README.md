@@ -707,3 +707,5 @@ Here is the list of the Arduino example sketches:
 - __BMP388_SPI_Normal_Multiple.ino__ : SPI Interface, Normal Mode, Multiple Devices
 
 - __BMP388_ESP32_HSPI_Normal.ino__ : ESP32 HSPI Interface, Normal Mode
+
+- __BMP388_ESP8266_I2C_Normal_DefinedPins.ino__ : ESP8266 I2C Interface, Normal Mode, User-Defined Pins
