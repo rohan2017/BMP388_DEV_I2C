@@ -39,7 +39,7 @@ This BMP388_DEV library offers the following features:
 ## __Version__
 
 - Version 1.0.0 -- Intial version
-- Version 1.0.1 -- Fix uninitialised structures, thanks to David Jade investigating and flagging up this issue
+- Version 1.0.1 -- Fix uninitialised structures, thanks to David Jade for investigating and flagging up this issue
 
 <a name="arduino_compatibility"></a>
 ## __Arduino Compatibility__
