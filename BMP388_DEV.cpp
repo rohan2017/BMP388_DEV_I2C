@@ -4,7 +4,7 @@
 	Copyright (C) Martin Lindupp 2020
 	
 	V1.0.0 -- Initial release 	
-	V1.0.1 -- Fix uninitialised structures, thanks to David Jade investigating and flagging up this issue
+	V1.0.1 -- Fix uninitialised structures, thanks to David Jade for investigating and flagging up this issue
 	
 	The MIT License (MIT)
 	Permission is hereby granted, free of charge, to any person obtaining a copy
