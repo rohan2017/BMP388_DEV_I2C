@@ -135,11 +135,11 @@ Note that the _begin()_ functions return the value 1 upon successful initialisat
 After initialisation it is possible to change the BMP388 configuration with the following functions:
 
 ```
-bmp388.setPresOversamping(OVERSAMPING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16, _32
+bmp388.setPresOversampling(OVERSAMPLING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16, _32
 ```
 
 ```
-bmp388.setTempOversamping(OVERSAMPING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16, _X32
+bmp388.setTempOversampling(OVERSAMPLING_X4);	// Options are OVERSAMPLING_SKIP, _X1, _X2, _X4, _X8, _X16, _X32
 ```
 
 ```
@@ -147,7 +147,7 @@ bmp388.setIIRFilter(IIR_FILTER_16);	// Options are IIR_FILTER_OFF, _2, _4, _8, _
 ```
 
 ```
-bmp388.setTimeStandby(TIME_STANDBY_2000MS);	// Options are TIME_STANDBY_05MS, _62MS, _125MS, _250MS, _500MS, _1000MS, 2000MS, 4000MS
+bmp388.setTimeStandby(TIME_STANDBY_2000MS);	// Options are TIME_STANDBY_5MS, _10MS, _20MS, _250MS, _40MS, _80MS, 160MS, 320MS, 640MS, 1280MS, 2560MS, 5120MS, 10240MS, 20480MS, 40960MS, 81920MS, 163840MS, 327680MS, 655360MS
 ```
 ---
 <a name="modes_of_operation"></a>
@@ -221,7 +221,7 @@ void setup()
 {
   Serial.begin(115200);                           // Initialise the serial port
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE 
-  bmp388.setTimeStandby(TIME_STANDBY_1000MS);     // Set the standby time to 1s
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1280ms
   bmp388.startNormalConversion();                 // Start NORMAL conversion mode
 }
 
@@ -234,7 +234,7 @@ void loop()
     Serial.print(pressure);    
     Serial.print(F("hPa   "));
     Serial.print(altitude);
-    Serial.println(F(m"));
+    Serial.println(F("m"));
   }
 }
 ```
