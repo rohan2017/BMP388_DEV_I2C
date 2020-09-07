@@ -38,8 +38,9 @@ This BMP388_DEV library offers the following features:
 <a name="version"></a>
 ## __Version__
 
-- Version 1.0.0 -- Intial version
+- Version 1.0.2 -- Modification to allow user-defined pins for I2C operation on the ESP32
 - Version 1.0.1 -- Fix uninitialised structures, thanks to David Jade for investigating and flagging up this issue
+- Version 1.0.0 -- Intial version
 
 <a name="arduino_compatibility"></a>
 ## __Arduino Compatibility__
@@ -72,6 +73,14 @@ BMP388_DEV bmp388;	// Set up I2C communications
 ```
 
 By default the library uses the BMP388's I2C address 0x77. (To use the alternate I2C address: 0x76, see the begin() function below.
+
+The ESP8266 and ESP32 also offer the option of selecting the I2C SDA and SDA pins as parameters:
+
+```
+BMP388_DEV bmp388(A6, A7);	// Set up I2C communications on ESP32 pins A6 (SDA) and A7 (SCL): bmp388(SDA, SCL);
+```
+
+If no parameters are selected, the ESP32 uses its default SDA and SCL pins.
 
 For SPI communication the chip select (CS) Arduino digital output pin is specified as an argument, for example digital pin 10:
 
@@ -709,3 +718,5 @@ Here is the list of the Arduino example sketches:
 - __BMP388_ESP32_HSPI_Normal.ino__ : ESP32 HSPI Interface, Normal Mode
 
 - __BMP388_ESP8266_I2C_Normal_DefinedPins.ino__ : ESP8266 I2C Interface, Normal Mode, User-Defined Pins
+
+- __BMP388_ESP32_I2C_Normal_DefinedPins.ino__ : ESP32 I2C Interface, Normal Mode, User-Defined Pins
