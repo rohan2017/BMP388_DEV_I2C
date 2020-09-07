@@ -5,6 +5,7 @@
 	
 	V1.0.0 -- Initial release
 	V1.0.1 -- Modification to allow user-defined pins for I2C operation on the ESP8266
+	V1.0.2 -- Modification to allow user-defined pins for I2C operation on the ESP32
 	
 	The MIT License (MIT)
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,8 +36,9 @@ Device::Device() : comms(I2C_COMMS) {}															// Initialise constructor f
 Device::Device(uint8_t sda, uint8_t scl) : comms(I2C_COMMS_DEFINED_PINS), sda(sda), scl(scl) {}	// Constructor for ESP8266 I2C with user-defined pins
 #endif
 Device::Device(uint8_t cs) : comms(SPI_COMMS), cs(cs), spiClockSpeed(1000000) {}		// Constructor for SPI communications
-#ifdef ARDUINO_ARCH_ESP32																														// Constructor for ESP32 HSPI communications
-Device::Device(uint8_t cs, uint8_t spiPort, SPIClass& spiClass) 
+#ifdef ARDUINO_ARCH_ESP32																														
+Device::Device(uint8_t sda, uint8_t scl) : comms(I2C_COMMS_DEFINED_PINS), sda(sda), scl(scl) {}	// Constructor for ESP32 I2C with user-defined pins
+Device::Device(uint8_t cs, uint8_t spiPort, SPIClass& spiClass) 										// Constructor for ESP32 HSPI communications
 	: comms(SPI_COMMS), cs(cs), spiPort(spiPort), spi(&spiClass), spiClockSpeed(1000000) {}
 #endif
 
@@ -79,7 +81,7 @@ void Device::initialise()																						// Initialise device communicatio
 		Wire.begin();																										// Initialise I2C communication
 		Wire.setClock(400000);																					// Set the SCL clock to default of 400kHz
 	}
-#ifdef ARDUINO_ARCH_ESP8266
+#if defined ARDUINO_ARCH_ESP8266 || defined ARDUINO_ARCH_ESP32
 	else if (comms == I2C_COMMS_DEFINED_PINS)													// Check if the ESP8266 has specified user-defined I2C pins
 	{
 		Wire.begin(sda, scl);																						// Initialise I2C communication with user-defined pins
