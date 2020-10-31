@@ -20,23 +20,6 @@ This BMP388_DEV library offers the following features:
 - Storage and burst reading of up to 72 temperature and pressure measurements using the BMP388's internal 512 byte FIFO memory
 
 ---
-## __Contents__
-
-1. [Version](#version)
-2. [Arduino Compatiblility](#arduino_compatibility)
-3. [Installation](#installation)
-3. [Usage](#usage)
-	1. [BMP388_DEV Library](#bmp388_dev_library)
-	2. [Device Initialisation](#device_intialisation)
-	3. [Device Configuration](#device_configuration)
-	4. [Modes Of Operation](#modes_of_operation)
-	5. [Results Acquisition](#results_acquisition)
-	6. [Code Implementation](#code_implementation)
-4. [Additional Features](#additional_features)
-	1. [Interrupts](#interrupts)
-	2. [FIFO (First In First Out) Operation](#fifo_operation)
-	3. [FIFO Operation With Interrupts](#fifo_operation_with_interrupts)
-5. [Example Code](#example_code)
 	
 <a name="version"></a>
 ## __Version__
