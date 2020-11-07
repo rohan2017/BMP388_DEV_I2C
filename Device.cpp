@@ -1,5 +1,5 @@
 /*
-  Device is an I2C/SPI compatible base class library.
+  Device is an I2C compatible base class library.
 	
 	Copyright (C) Martin Lindupp 2020
 	
