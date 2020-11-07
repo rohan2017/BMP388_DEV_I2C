@@ -37,28 +37,24 @@ Device::Device() : comms(I2C_COMMS) {}  // Initialise constructor for I2C commun
 // Device Public Member Function
 ////////////////////////////////////////////////////////////////////////////////
 
-void Device::setClock(uint32_t clockSpeed)  // Set the I2C or SPI clock speed
+void Device::setClock(uint32_t clockSpeed)  // Set the I2C clock speed
 {
 	if (comms == I2C_COMMS)
 	{
 		Wire.setClock(clockSpeed);
 	}
-	else
-	{
-		spiClockSpeed = clockSpeed;
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Device I2C & SPI Wrapper (Protected) Member Functions
+// Device I2C Wrapper (Protected) Member Functions
 ////////////////////////////////////////////////////////////////////////////////
 
 void Device::initialise()  // Initialise device communications
 {
-  if (comms == I2C_COMMS)  // Check with communications bus has been selected I2C or SPI
+  if (comms == I2C_COMMS)  // Check with communications bus has been selected I2C
 	{
 		Wire.begin();  // Initialise I2C communication
-		Wire.setClock(400000);  // Set the SCL clock to default of 400kHz
+		Wire.setClock(400000UL);  // Set the SCL clock to default of 400kHz
 	}
 }
 
@@ -86,7 +82,7 @@ uint8_t Device::readByte(uint8_t subAddress)  // Read a byte from the sub-addres
 		Wire.beginTransmission(address);
 		Wire.write(subAddress);
 		Wire.endTransmission(false);
-		Wire.requestFrom(address, (uint8_t)1)
+		Wire.requestFrom(address, (uint8_t)1);
 		data = Wire.read();
 	}
   return data;  // Return data read from sub-address register

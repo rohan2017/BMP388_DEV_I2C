@@ -46,13 +46,13 @@ uint8_t BMP388_DEV::begin(Mode mode,  // Initialise BMP388 device settings
 	initialise();  // Call the Device base class "initialise" function
 	if (!reset())  // Reset the BMP388 barometer
 	{		
-		return 0;																												// If unable to reset return 0
+		return 0;  // If unable to reset return 0
 	}
 	if (readByte(BMP388_CHIP_ID) != DEVICE_ID)  // Check the device ID
-  {  
+	{  
 		return 0;  // If the ID is incorrect return 0
-  }	 
-  readBytes(BMP388_TRIM_PARAMS, (uint8_t*)&params, sizeof(params)); // Read the trim parameters into the params structure
+	}	 
+	readBytes(BMP388_TRIM_PARAMS, (uint8_t*)&params, sizeof(params)); // Read the trim parameters into the params structure
 	floatParams.param_T1 = (float)params.param_T1 / powf(2.0f, -8.0f); // Calculate the floating point trim parameters
 	floatParams.param_T2 = (float)params.param_T2 / powf(2.0f, 30.0f);
 	floatParams.param_T3 = (float)params.param_T3 / powf(2.0f, 48.0f);
@@ -76,22 +76,10 @@ uint8_t BMP388_DEV::begin(Mode mode,  // Initialise BMP388 device settings
 	return 1;  // Report successful initialisation
 }
 
-uint8_t BMP388_DEV::begin(Mode mode, uint8_t addr)  // Initialise BMP388 with default settings, but selected mode and
-{																																		// I2C address
-	setI2CAddress(addr);
-	return begin(mode);
-}
-
-uint8_t BMP388_DEV::begin(uint8_t addr)  // Initialise BMP388 with default settings and selected I2C address
-{
-	setI2CAddress(addr);
-	return begin();
-}
-
-uint8_t BMP388_DEV::reset()																					// Reset the BMP388 barometer
+uint8_t BMP388_DEV::reset()  // Reset the BMP388 barometer
 {
 	writeByte(BMP388_CMD, RESET_CODE);  // Write the reset code to the command register 									
-  delay(10);																												// Wait for 10ms
+	delay(10);  // Wait for 10ms
 	event.reg = readByte(BMP388_EVENT);  // Read the BMP388's event register
 	return event.bit.por_detected;  // Return if device reset is complete																					
 }

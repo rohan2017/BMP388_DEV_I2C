@@ -235,7 +235,7 @@ class BMP388_DEV : public Device {  // Derive the BMP388_DEV class from the Devi
 		void setIntOutputDrive(OutputDrive outputDrive);  // Sets the interrupt pin's output drive, PUSH_PULL OR OPEN_DRAIN, default PUSH_PULL
 		void setIntActiveLevel(ActiveLevel activeLevel);  // Set the interrupt active level, ACTIVE_LOW or ACTIVE_HIGH, default ACTIVE_HIGH
 		void setIntLatchConfig(LatchConfig latchConfig);  // Set the interrupt latch, UNLATCHED or LATCHED, default UNLATCHED													
-		void enableFIFO(PressEnable pressEnable = PRESS_ENABLED,   Enable the FIFO 
+		void enableFIFO(PressEnable pressEnable = PRESS_ENABLED,  //Enable the FIFO 
 										AltEnable altEnable = ALT_ENABLED,
 										TimeEnable timeEnable = TIME_ENABLED,
 										Subsampling subsampling = SUBSAMPLING_OFF,
@@ -281,7 +281,7 @@ class BMP388_DEV : public Device {  // Derive the BMP388_DEV class from the Devi
 			FIFO_SENSOR_PRESS		= 0x94
 		};
 		
-		struct {																										// The BMP388 compensation trim parameters (coefficients)
+		struct {  // The BMP388 compensation trim parameters (coefficients)
 			uint16_t param_T1;
 			uint16_t param_T2;
 			int8_t   param_T3;
@@ -298,7 +298,7 @@ class BMP388_DEV : public Device {  // Derive the BMP388_DEV class from the Devi
 			int8_t 	 param_P11;
 		} __attribute__ ((packed)) params;
 		
-		struct FloatParams {																				// The BMP388 float point compensation trim parameters
+		struct FloatParams {  // The BMP388 float point compensation trim parameters
 			float param_T1;
 			float param_T2;
 			float param_T3;
