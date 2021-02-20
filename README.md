@@ -1,4 +1,4 @@
-# BMP388_DEV
+# BMP388_DEV_I2C
 
 Thanks to MartinL1 for this library. I was having issues using it with my STM32 blackpill, so I simply shaved down the parts that I didn't need/that could be causing problems. THIS LIBRARY DOES NOT DO SPI, nor does it allow you to set custom SCL and SDA pins. 
 
